@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>WhiteClub</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0d0d0d;--bg2:#161616;--bg3:#1e1e1e;--bg4:#252525;
+  --text:#f0f0f0;--text2:#aaa;--text3:#555;
+  --acc:#ffffff;--acc-t:#000;
+  --brd:#2a2a2a;--r:12px;
+  --red:#ef4444;--grn:#22c55e;--blue:#3b82f6;
+}
+body{background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh;overflow:hidden}
+
+/* BG */
+.bg-art{position:fixed;inset:0;z-index:0;background:radial-gradient(ellipse at 20% 50%,rgba(59,130,246,.07) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(139,92,246,.07) 0%,transparent 60%)}
+
+/* SCREENS */
+.screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;transition:opacity .3s}
+.screen.hidden{opacity:0;pointer-events:none}
+
+/* LOGO */
+.logo{font-size:32px;font-weight:900;letter-spacing:-2px;margin-bottom:6px}
+.logo span{color:var(--text2);font-weight:300}
+.tagline{font-size:12px;color:var(--text3);letter-spacing:3px;text-transform:uppercase;margin-bottom:40px}
+
+/* CARDS */
+.card{background:var(--bg2);border:1px solid var(--brd);border-radius:18px;padding:28px;width:100%;max-width:380px;box-shadow:0 8px 40px rgba(0,0,0,.4)}
+.card-title{font-size:18px;font-weight:800;margin-bottom:6px}
+.card-sub{font-size:13px;color:var(--text2);margin-bottom:24px}
+
+/* INPUTS */
+.inp{width:100%;padding:12px 14px;border:1px solid var(--brd);border-radius:10px;background:var(--bg3);color:var(--text);font-size:14px;outline:none;transition:border-color .2s;margin-bottom:10px}
+.inp:focus{border-color:rgba(255,255,255,.3)}
+.inp::placeholder{color:var(--text3)}
+
+/* BUTTONS */
+.btn{width:100%;padding:13px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s;margin-bottom:8px}
+.btn-white{background:#fff;color:#000}
+.btn-white:hover{background:#e5e5e5}
+.btn-ghost{background:transparent;border:1px solid var(--brd);color:var(--text2)}
+.btn-ghost:hover{border-color:rgba(255,255,255,.3);color:var(--text)}
+.btn-red{background:var(--red);color:#fff}
+.btn-sm{padding:8px 16px;width:auto;font-size:13px;border-radius:8px}
+
+/* HOME CHOICES */
+.choice-wrap{display:flex;flex-direction:column;gap:12px;width:100%;max-width:340px}
+.choice-btn{padding:20px 24px;border:1px solid var(--brd);border-radius:16px;background:var(--bg2);cursor:pointer;transition:all .2s;text-align:left}
+.choice-btn:hover{border-color:rgba(255,255,255,.2);background:var(--bg3);transform:translateY(-2px)}
+.choice-icon{font-size:28px;margin-bottom:8px}
+.choice-title{font-size:16px;font-weight:700;color:var(--text)}
+.choice-sub{font-size:12px;color:var(--text2);margin-top:3px}
+
+/* ROOM CODE */
+.room-code{font-size:36px;font-weight:900;letter-spacing:8px;text-align:center;padding:20px;background:var(--bg3);border-radius:12px;margin:16px 0;border:1px solid var(--brd);cursor:pointer;transition:background .2s}
+.room-code:hover{background:var(--bg4)}
+.room-code-hint{font-size:11px;color:var(--text3);text-align:center;margin-top:-8px;margin-bottom:16px}
+
+/* ERR */
+.err{font-size:12px;color:var(--red);min-height:16px;margin-bottom:8px;text-align:center}
+.success{font-size:12px;color:var(--grn);min-height:16px;margin-bottom:8px;text-align:center}
+
+/* ── ROOM ── */
+#room-screen{display:flex;flex-direction:column;padding:0;overflow:hidden}
+
+/* TOP BAR */
+.room-bar{height:48px;background:var(--bg2);border-bottom:1px solid var(--brd);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;z-index:20}
+.rb-logo{font-size:14px;font-weight:900;letter-spacing:-1px}
+.rb-room{font-size:12px;color:var(--text2);background:var(--bg3);padding:4px 10px;border-radius:6px;font-weight:700;letter-spacing:2px;cursor:pointer}
+.rb-users{font-size:12px;color:var(--text3);margin-left:auto}
+.rb-btn{padding:6px 14px;border:1px solid var(--brd);border-radius:8px;background:none;color:var(--text2);font-size:12px;cursor:pointer;transition:all .2s}
+.rb-btn:hover{border-color:rgba(255,255,255,.3);color:var(--text)}
+.rb-btn.danger{border-color:var(--red);color:var(--red)}
+
+/* MAIN LAYOUT */
+.room-body{flex:1;display:flex;overflow:hidden;min-height:0}
+
+/* VIDEO PANEL */
+.video-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;background:#000;min-width:0}
+.video-wrap{flex:1;position:relative;overflow:hidden}
+.video-wrap iframe,.video-wrap video{width:100%;height:100%;border:none;display:block}
+.video-placeholder{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:var(--text3);background:#000}
+.video-placeholder-ico{font-size:48px;opacity:.3}
+.video-placeholder-txt{font-size:14px;text-align:center;max-width:240px;line-height:1.6}
+
+/* VIDEO CONTROLS */
+.vid-controls{height:52px;background:rgba(0,0,0,.8);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;backdrop-filter:blur(8px)}
+.vid-btn{background:none;border:none;cursor:pointer;color:var(--text);font-size:20px;padding:6px;border-radius:8px;transition:background .15s;display:flex;align-items:center;justify-content:center}
+.vid-btn:hover{background:rgba(255,255,255,.1)}
+.vid-time{font-size:12px;color:var(--text2);font-weight:600;min-width:80px}
+.vid-progress{flex:1;height:4px;background:rgba(255,255,255,.15);border-radius:2px;cursor:pointer;position:relative}
+.vid-progress-fill{height:100%;background:#fff;border-radius:2px;pointer-events:none;transition:width .1s}
+.sync-badge{font-size:10px;font-weight:700;padding:3px 8px;border-radius:6px;background:rgba(34,197,94,.15);color:var(--grn);border:1px solid rgba(34,197,94,.3);margin-left:auto}
+.sync-badge.off{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.3)}
+
+/* SIDEBAR */
+.sidebar{width:280px;display:flex;flex-direction:column;border-left:1px solid var(--brd);background:var(--bg2);flex-shrink:0}
+@media(max-width:640px){.sidebar{position:fixed;bottom:0;left:0;right:0;width:100%;height:220px;border-left:none;border-top:1px solid var(--brd)};.room-body{flex-direction:column}}
+
+/* USERS LIST */
+.users-panel{padding:12px;border-bottom:1px solid var(--brd);flex-shrink:0}
+.users-title{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px}
+.user-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:var(--bg3);border-radius:20px;font-size:12px;margin:2px;font-weight:600}
+.user-dot{width:7px;height:7px;border-radius:50%;background:var(--grn);flex-shrink:0}
+.user-chip.host .user-dot{background:#f59e0b}
+.kick-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:12px;margin-left:2px;padding:1px 3px}
+.kick-btn:hover{color:var(--red)}
+
+/* CHAT */
+.chat-panel{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.chat-messages{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;scrollbar-width:thin;scrollbar-color:var(--brd) transparent}
+.chat-msg{display:flex;flex-direction:column;gap:2px}
+.chat-msg-header{display:flex;align-items:baseline;gap:6px}
+.chat-name{font-size:11px;font-weight:700;color:var(--text2)}
+.chat-name.host-name{color:#f59e0b}
+.chat-time{font-size:10px;color:var(--text3)}
+.chat-text{font-size:13px;line-height:1.5;word-break:break-word;color:var(--text)}
+.chat-msg.system .chat-text{font-size:11px;color:var(--text3);font-style:italic}
+.chat-input-wrap{padding:10px;border-top:1px solid var(--brd);display:flex;gap:8px;flex-shrink:0}
+.chat-inp{flex:1;padding:9px 12px;border:1px solid var(--brd);border-radius:10px;background:var(--bg3);color:var(--text);font-size:13px;outline:none}
+.chat-inp:focus{border-color:rgba(255,255,255,.25)}
+.chat-inp::placeholder{color:var(--text3)}
+.chat-send{padding:9px 14px;border:none;border-radius:10px;background:#fff;color:#000;font-size:13px;font-weight:700;cursor:pointer}
+.chat-inp:disabled,.chat-send:disabled{opacity:.4;cursor:not-allowed}
+
+/* NOTIFICATION */
+.notif{position:fixed;top:60px;left:50%;transform:translateX(-50%) translateY(-20px);background:var(--bg2);border:1px solid var(--brd);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;z-index:100;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none}
+.notif.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* LOADING */
+.loader{width:32px;height:32px;border:2px solid var(--brd);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* MUTED */
+.muted-banner{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:8px 12px;font-size:12px;color:var(--red);text-align:center;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="bg-art"></div>
+
+<!-- NOTIFICATION -->
+<div class="notif" id="notif"></div>
+
+<!-- HOME SCREEN -->
+<div class="screen" id="home-screen">
+  <div class="logo">White<span>Club</span></div>
+  <div class="tagline">Made by White</div>
+  <div class="choice-wrap">
+    <button class="choice-btn" onclick="showScreen('create-screen')">
+      <div class="choice-icon">🎬</div>
+      <div class="choice-title">Create Room</div>
+      <div class="choice-sub">Start a new watch party & invite friends</div>
+    </button>
+    <button class="choice-btn" onclick="showScreen('join-screen')">
+      <div class="choice-icon">🚪</div>
+      <div class="choice-title">Join Room</div>
+      <div class="choice-sub">Enter a room code to join your friend</div>
+    </button>
+  </div>
+</div>
+
+<!-- CREATE SCREEN -->
+<div class="screen hidden" id="create-screen">
+  <div class="card">
+    <div class="card-title">Create a Room</div>
+    <div class="card-sub">Set up your watch party</div>
+    <input class="inp" id="c-name" placeholder="Your name" maxlength="20">
+    <input class="inp" id="c-url" placeholder="Video URL (archive.org or direct link)" autocomplete="off">
+    <div class="err" id="c-err"></div>
+    <button class="btn btn-white" onclick="doCreate()">Create Room →</button>
+    <button class="btn btn-ghost" onclick="showScreen('home-screen')">← Back</button>
+  </div>
+</div>
+
+<!-- JOIN SCREEN -->
+<div class="screen hidden" id="join-screen">
+  <div class="card">
+    <div class="card-title">Join a Room</div>
+    <div class="card-sub">Enter the room code from your friend</div>
+    <input class="inp" id="j-name" placeholder="Your name" maxlength="20">
+    <input class="inp" id="j-code" placeholder="Room code (e.g. AB3X9)" maxlength="5" style="text-transform:uppercase;letter-spacing:4px;font-weight:700;font-size:16px" oninput="this.value=this.value.toUpperCase()">
+    <div class="err" id="j-err"></div>
+    <button class="btn btn-white" onclick="doJoin()">Join Room →</button>
+    <button class="btn btn-ghost" onclick="showScreen('home-screen')">← Back</button>
+  </div>
+</div>
+
+<!-- ROOM SCREEN -->
+<div class="screen hidden" id="room-screen">
+  <!-- TOP BAR -->
+  <div class="room-bar">
+    <div class="rb-logo">WC</div>
+    <div class="rb-room" onclick="copyCode()" title="Click to copy">
+      <span id="rb-code">-----</span>
+    </div>
+    <div class="rb-users" id="rb-users">0 watching</div>
+    <button class="rb-btn" id="rb-leave" onclick="leaveRoom()">Leave</button>
+  </div>
+
+  <!-- BODY -->
+  <div class="room-body">
+    <!-- VIDEO -->
+    <div class="video-panel">
+      <div class="video-wrap" id="video-wrap">
+        <div class="video-placeholder">
+          <div class="video-placeholder-ico">📺</div>
+          <div class="video-placeholder-txt">Waiting for host to set video...</div>
+        </div>
+      </div>
+      <div class="vid-controls">
+        <button class="vid-btn" id="play-btn" onclick="togglePlay()" title="Play/Pause">▶</button>
+        <div class="vid-time" id="vid-time">0:00</div>
+        <div class="vid-progress" id="vid-progress" onclick="seekVideo(event)">
+          <div class="vid-progress-fill" id="vid-fill" style="width:0%"></div>
+        </div>
+        <div class="sync-badge" id="sync-badge">● LIVE</div>
+      </div>
+    </div>
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
+      <!-- USERS -->
+      <div class="users-panel">
+        <div class="users-title">In Room</div>
+        <div id="users-list"></div>
+      </div>
+      <!-- CHAT -->
+      <div class="chat-panel">
+        <div class="chat-messages" id="chat-messages"></div>
+        <div id="muted-banner" style="display:none" class="muted-banner">You have been muted by the host</div>
+        <div class="chat-input-wrap">
+          <input class="chat-inp" id="chat-inp" placeholder="Say something..." maxlength="200" onkeydown="if(event.key==='Enter')sendChat()">
+          <button class="chat-send" onclick="sendChat()" id="chat-send-btn">↑</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+<script>
+'use strict';
+
+// ══ FIREBASE ══
+firebase.initializeApp({
+  apiKey: "AIzaSyBcahoZbTiYD1OErVuudrX-r9lcz5AcO5w",
+  authDomain: "whiteclub-60221.firebaseapp.com",
+  databaseURL: "https://whiteclub-60221-default-rtdb.firebaseio.com",
+  projectId: "whiteclub-60221",
+  storageBucket: "whiteclub-60221.firebasestorage.app",
+  messagingSenderId: "26858068381",
+  appId: "1:26858068381:web:ca25def077d681ca23f774"
+});
+const db = firebase.database();
+
+// ══ STATE ══
+let myName = '', myId = '', roomCode = '', isHost = false;
+let roomRef = null, usersRef = null, chatRef = null, videoRef = null;
+let videoEl = null, iframeEl = null;
+let isPlaying = false, isMuted = false;
+let lastSyncTime = 0, syncCooldown = false;
+let listeners = [];
+
+// ══ UTILS ══
+function genCode() {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  return Array.from({length:5}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+}
+function genId() { return Math.random().toString(36).slice(2,10); }
+function fmtTime(s) {
+  s = Math.floor(s||0);
+  const m = Math.floor(s/60), sec = s%60;
+  return m+':'+(sec<10?'0':'')+sec;
+}
+
+// ══ SCREENS ══
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+
+// ══ NOTIFICATIONS ══
+function showNotif(msg, duration=3000) {
+  const el = document.getElementById('notif');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), duration);
+}
+
+// ══ COPY CODE ══
+function copyCode() {
+  navigator.clipboard.writeText(roomCode).then(() => showNotif('📋 Room code copied: ' + roomCode));
+}
+
+// ══ CREATE ROOM ══
+async function doCreate() {
+  const name = document.getElementById('c-name').value.trim();
+  const url = document.getElementById('c-url').value.trim();
+  const err = document.getElementById('c-err');
+  if (!name) { err.textContent = 'Enter your name'; return; }
+  if (!url) { err.textContent = 'Enter a video URL'; return; }
+
+  myName = name;
+  myId = genId();
+  roomCode = genCode();
+  isHost = true;
+
+  roomRef = db.ref('rooms/' + roomCode);
+  await roomRef.set({
+    code: roomCode,
+    hostId: myId,
+    videoUrl: url,
+    video: { playing: false, time: 0, updatedAt: Date.now() },
+    createdAt: Date.now()
+  });
+
+  // Remove room when host disconnects
+  roomRef.onDisconnect().remove();
+
+  await joinRoomData();
+  showScreen('room-screen');
+  initRoom(url);
+}
+
+// ══ JOIN ROOM ══
+async function doJoin() {
+  const name = document.getElementById('j-name').value.trim();
+  const code = document.getElementById('j-code').value.trim().toUpperCase();
+  const err = document.getElementById('j-err');
+  if (!name) { err.textContent = 'Enter your name'; return; }
+  if (code.length !== 5) { err.textContent = 'Enter a valid 5-character code'; return; }
+
+  err.textContent = 'Connecting...';
+  const snap = await db.ref('rooms/' + code).get();
+  if (!snap.exists()) { err.textContent = '❌ Room not found'; return; }
+
+  myName = name;
+  myId = genId();
+  roomCode = code;
+  isHost = false;
+
+  roomRef = db.ref('rooms/' + roomCode);
+  await joinRoomData();
+
+  const data = snap.val();
+  showScreen('room-screen');
+  initRoom(data.videoUrl);
+  showNotif('✅ Joined room ' + roomCode);
+}
+
+async function joinRoomData() {
+  usersRef = db.ref('rooms/' + roomCode + '/users/' + myId);
+  await usersRef.set({ name: myName, id: myId, host: isHost, joinedAt: Date.now(), muted: false });
+  usersRef.onDisconnect().remove();
+  videoRef = db.ref('rooms/' + roomCode + '/video');
+}
+
+// ══ INIT ROOM ══
+function initRoom(url) {
+  document.getElementById('rb-code').textContent = roomCode;
+
+  // Listen for room deletion
+  const rl = roomRef.on('value', snap => {
+    if (!snap.exists() && !isHost) {
+      showNotif('🚫 Host ended the room', 4000);
+      setTimeout(() => { cleanupRoom(); showScreen('home-screen'); }, 1500);
+    }
+  });
+  listeners.push(() => roomRef.off('value', rl));
+
+  // Render video
+  renderVideo(url);
+
+  // Listen video state
+  const vl = videoRef.on('value', snap => {
+    if (!snap.exists()) return;
+    const v = snap.val();
+    applyVideoState(v);
+  });
+  listeners.push(() => videoRef.off('value', vl));
+
+  // Listen users
+  const ul = db.ref('rooms/' + roomCode + '/users').on('value', snap => {
+    const users = snap.val() || {};
+    renderUsers(users);
+    const count = Object.keys(users).length;
+    document.getElementById('rb-users').textContent = count + ' watching';
+    // Check mute
+    const me = users[myId];
+    if (me && me.muted) {
+      isMuted = true;
+      document.getElementById('muted-banner').style.display = 'block';
+      document.getElementById('chat-inp').disabled = true;
+      document.getElementById('chat-send-btn').disabled = true;
+    } else {
+      isMuted = false;
+      document.getElementById('muted-banner').style.display = 'none';
+      document.getElementById('chat-inp').disabled = false;
+      document.getElementById('chat-send-btn').disabled = false;
+    }
+  });
+  listeners.push(() => db.ref('rooms/' + roomCode + '/users').off('value', ul));
+
+  // Listen chat
+  chatRef = db.ref('rooms/' + roomCode + '/chat');
+  const cl = chatRef.limitToLast(100).on('child_added', snap => {
+    const msg = snap.val();
+    appendChat(msg);
+  });
+  listeners.push(() => chatRef.off('child_added', cl));
+
+  // System message
+  if (!isHost) {
+    chatRef.push({ type:'system', text: myName + ' joined the room', ts: Date.now() });
+  }
+
+  // Host controls
+  if (isHost) {
+    document.getElementById('rb-leave').textContent = 'End Room';
+    document.getElementById('rb-leave').classList.add('danger');
+  }
+
+  // Update video time every second
+  setInterval(updateTimeDisplay, 1000);
+}
+
+// ══ VIDEO ══
+function renderVideo(url) {
+  const wrap = document.getElementById('video-wrap');
+  if (!url) return;
+
+  // Detect archive.org
+  if (url.includes('archive.org')) {
+    // Convert to embed URL if needed
+    let embedUrl = url;
+    if (!url.includes('/embed/')) {
+      const id = url.split('/details/')[1]?.split('/')[0] || url.split('/').pop();
+      embedUrl = 'https://archive.org/embed/' + id;
+    }
+    wrap.innerHTML = `<iframe id="video-iframe" src="${embedUrl}" allowfullscreen allow="autoplay"></iframe>`;
+    iframeEl = document.getElementById('video-iframe');
+    // For archive.org we show manual controls note
+    document.getElementById('play-btn').title = 'Sync play/pause';
+  } else {
+    // Direct video file
+    wrap.innerHTML = `<video id="video-el" src="${url}" preload="metadata" style="width:100%;height:100%;background:#000" onloadedmetadata="onVideoMeta()"></video>`;
+    videoEl = document.getElementById('video-el');
+    videoEl.addEventListener('play', () => { if (!syncCooldown) broadcastVideoState(); });
+    videoEl.addEventListener('pause', () => { if (!syncCooldown) broadcastVideoState(); });
+    videoEl.addEventListener('seeked', () => { if (!syncCooldown) broadcastVideoState(); });
+    videoEl.addEventListener('timeupdate', updateTimeDisplay);
+  }
+}
+
+function onVideoMeta() {
+  // Sync to current room state
+  videoRef.get().then(snap => {
+    if (snap.exists()) applyVideoState(snap.val());
+  });
+}
+
+function applyVideoState(v) {
+  if (!videoEl) return;
+  const now = Date.now();
+  const elapsed = (now - v.updatedAt) / 1000;
+  const targetTime = v.time + (v.playing ? elapsed : 0);
+
+  syncCooldown = true;
+  // Seek if off by more than 2s
+  if (Math.abs(videoEl.currentTime - targetTime) > 2) {
+    videoEl.currentTime = Math.max(0, targetTime);
+  }
+  if (v.playing && videoEl.paused) {
+    videoEl.play().catch(()=>{});
+    document.getElementById('play-btn').textContent = '⏸';
+  } else if (!v.playing && !videoEl.paused) {
+    videoEl.pause();
+    document.getElementById('play-btn').textContent = '▶';
+  }
+  isPlaying = v.playing;
+  setTimeout(() => syncCooldown = false, 500);
+}
+
+function broadcastVideoState() {
+  if (!isHost || !videoEl) return;
+  videoRef.set({
+    playing: !videoEl.paused,
+    time: videoEl.currentTime,
+    updatedAt: Date.now()
+  });
+}
+
+function togglePlay() {
+  if (videoEl) {
+    if (videoEl.paused) { videoEl.play().catch(()=>{}); }
+    else { videoEl.pause(); }
+    if (isHost) broadcastVideoState();
+    else showNotif('Only the host can control playback');
+  } else if (iframeEl) {
+    // archive.org iframe — broadcast sync signal
+    if (isHost) {
+      isPlaying = !isPlaying;
+      videoRef.set({ playing: isPlaying, time: 0, updatedAt: Date.now() });
+      showNotif(isPlaying ? '▶ Playing' : '⏸ Paused');
+    } else {
+      showNotif('Only the host can control playback');
+    }
+  }
+}
+
+function seekVideo(e) {
+  if (!videoEl || !isHost) { if(!isHost) showNotif('Only the host can seek'); return; }
+  const bar = document.getElementById('vid-progress');
+  const pct = e.offsetX / bar.offsetWidth;
+  videoEl.currentTime = pct * (videoEl.duration || 0);
+  if (isHost) broadcastVideoState();
+}
+
+function updateTimeDisplay() {
+  if (!videoEl) return;
+  const cur = videoEl.currentTime, dur = videoEl.duration||0;
+  document.getElementById('vid-time').textContent = fmtTime(cur) + (dur ? ' / '+fmtTime(dur) : '');
+  const pct = dur ? (cur/dur*100) : 0;
+  document.getElementById('vid-fill').style.width = pct + '%';
+  document.getElementById('play-btn').textContent = videoEl.paused ? '▶' : '⏸';
+}
+
+// ══ USERS ══
+function renderUsers(users) {
+  const list = document.getElementById('users-list');
+  list.innerHTML = Object.values(users).map(u => {
+    const isMe = u.id === myId;
+    const canKick = isHost && !u.host;
+    return `<div class="user-chip ${u.host?'host':''}">
+      <div class="user-dot"></div>
+      <span>${u.name}${isMe?' (you)':''}${u.host?' 👑':''}</span>
+      ${canKick ? `<button class="kick-btn" onclick="kickUser('${u.id}','${u.name}')" title="Kick">✕</button>` : ''}
+    </div>`;
+  }).join('');
+
+  // Notify new joins
+  Object.values(users).forEach(u => {
+    if (!u.host && !u._notified) {
+      // Will be handled via chat system messages
+    }
+  });
+}
+
+// ══ HOST ACTIONS ══
+function kickUser(uid, uname) {
+  if (!isHost) return;
+  db.ref('rooms/' + roomCode + '/users/' + uid).remove();
+  chatRef.push({ type:'system', text: uname + ' was removed from the room', ts: Date.now() });
+  showNotif('🚫 ' + uname + ' removed');
+}
+
+function muteUser(uid, uname) {
+  if (!isHost) return;
+  db.ref('rooms/' + roomCode + '/users/' + uid + '/muted').set(true);
+  chatRef.push({ type:'system', text: uname + ' was muted by the host', ts: Date.now() });
+}
+
+// ══ CHAT ══
+function sendChat() {
+  if (isMuted) return;
+  const inp = document.getElementById('chat-inp');
+  const text = inp.value.trim();
+  if (!text) return;
+  chatRef.push({
+    type: 'msg',
+    name: myName,
+    id: myId,
+    host: isHost,
+    text,
+    ts: Date.now()
+  });
+  inp.value = '';
+}
+
+function appendChat(msg) {
+  const box = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = 'chat-msg' + (msg.type==='system'?' system':'');
+  const time = new Date(msg.ts).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+  if (msg.type === 'system') {
+    div.innerHTML = `<div class="chat-text">— ${msg.text}</div>`;
+  } else {
+    div.innerHTML = `
+      <div class="chat-msg-header">
+        <span class="chat-name ${msg.host?'host-name':''}">${msg.name}${msg.host?' 👑':''}</span>
+        <span class="chat-time">${time}</span>
+        ${isHost && msg.id !== myId ? `<button style="background:none;border:none;color:var(--text3);cursor:pointer;font-size:10px;margin-left:auto" onclick="muteUser('${msg.id}','${msg.name}')" title="Mute">🔇</button>` : ''}
+      </div>
+      <div class="chat-text">${escHtml(msg.text)}</div>`;
+    // Notify if not visible
+    if (msg.id !== myId) showNotif('💬 ' + msg.name + ': ' + msg.text.slice(0,40), 2000);
+  }
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ══ LEAVE ══
+function leaveRoom() {
+  if (isHost) {
+    if (!confirm('End the room for everyone?')) return;
+    roomRef.remove();
+  } else {
+    usersRef.remove();
+    chatRef.push({ type:'system', text: myName + ' left the room', ts: Date.now() });
+  }
+  cleanupRoom();
+  showScreen('home-screen');
+}
+
+function cleanupRoom() {
+  listeners.forEach(off => off());
+  listeners = [];
+  roomRef = usersRef = chatRef = videoRef = null;
+  videoEl = iframeEl = null;
+  isHost = false; myName = ''; myId = ''; roomCode = '';
+  document.getElementById('video-wrap').innerHTML = `<div class="video-placeholder"><div class="video-placeholder-ico">📺</div><div class="video-placeholder-txt">Waiting for host to set video...</div></div>`;
+  document.getElementById('chat-messages').innerHTML = '';
+  document.getElementById('users-list').innerHTML = '';
+  document.getElementById('rb-leave').textContent = 'Leave';
+  document.getElementById('rb-leave').classList.remove('danger');
+}
+
+// ══ HANDLE USER KICKED ══
+setInterval(() => {
+  if (!roomCode || !myId || isHost) return;
+  db.ref('rooms/' + roomCode + '/users/' + myId).get().then(snap => {
+    if (roomCode && !snap.exists()) {
+      showNotif('🚫 You were removed from the room', 4000);
+      setTimeout(() => { cleanupRoom(); showScreen('home-screen'); }, 1500);
+    }
+  });
+}, 3000);
+</script>
+</body>
+</html>
