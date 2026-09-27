@@ -7,124 +7,158 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{
-  --bg:#0a0a0a;--bg2:#111;--bg3:#1a1a1a;--bg4:#222;
+  --bg:#0a0a0a;--bg2:#141414;--bg3:#1c1c1c;--bg4:#242424;
   --text:#f0f0f0;--text2:#888;--text3:#444;
-  --brd:#222;--r:10px;
-  --red:#ef4444;--grn:#22c55e;--gold:#f59e0b;--blue:#3b82f6;
+  --brd:#2a2a2a;
+  --red:#ef4444;--grn:#22c55e;--gold:#f59e0b;--blue:#3b82f6;--pur:#a855f7;
 }
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 
+/* SCREENS */
 .screen{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;transition:opacity .25s}
 .screen.off{opacity:0;pointer-events:none}
-
-.logo{font-size:38px;font-weight:900;letter-spacing:-2px}
-.logo em{color:var(--text2);font-style:normal;font-weight:300}
-.made{font-size:11px;color:var(--text3);letter-spacing:2px;text-transform:uppercase;margin-bottom:16px}
-
-.card{background:var(--bg2);border:1px solid var(--brd);border-radius:16px;padding:24px;width:100%;max-width:360px}
-.card-t{font-size:17px;font-weight:800;margin-bottom:4px}
-.card-s{font-size:12px;color:var(--text2);margin-bottom:20px}
-
-.inp{width:100%;padding:12px 14px;border:1px solid var(--brd);border-radius:10px;background:var(--bg3);color:var(--text);font-size:14px;outline:none;margin-bottom:10px;transition:border-color .2s}
-.inp:focus{border-color:#444}
+.logo{font-size:40px;font-weight:900;letter-spacing:-2px}
+.logo em{color:var(--text3);font-style:normal;font-weight:300}
+.made{font-size:10px;color:var(--text3);letter-spacing:3px;text-transform:uppercase;margin-bottom:20px}
+.card{background:var(--bg2);border:1px solid var(--brd);border-radius:18px;padding:26px;width:100%;max-width:360px}
+.card-t{font-size:18px;font-weight:800;margin-bottom:4px}
+.card-s{font-size:12px;color:var(--text2);margin-bottom:22px}
+.inp{width:100%;padding:13px 15px;border:1px solid var(--brd);border-radius:11px;background:var(--bg3);color:var(--text);font-size:14px;outline:none;margin-bottom:10px;transition:border-color .2s}
+.inp:focus{border-color:#555}
 .inp::placeholder{color:var(--text3)}
-
-.btn{width:100%;padding:13px;border:none;border-radius:10px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;transition:opacity .15s}
-.btn:active{opacity:.8}
+.btn{width:100%;padding:14px;border:none;border-radius:11px;font-size:14px;font-weight:700;cursor:pointer;margin-bottom:8px;transition:all .15s}
+.btn:active{transform:scale(.98)}
 .btn-w{background:#fff;color:#000}
+.btn-w:hover{background:#e8e8e8}
 .btn-g{background:transparent;border:1px solid var(--brd);color:var(--text2)}
-.btn-g:hover{border-color:#444;color:var(--text)}
-
+.btn-g:hover{border-color:#555;color:var(--text)}
 .err{font-size:12px;color:var(--red);text-align:center;min-height:16px;margin-bottom:6px}
-
-.choice-wrap{display:flex;flex-direction:column;gap:10px;width:100%;max-width:340px}
-.choice{padding:18px 20px;border:1px solid var(--brd);border-radius:14px;background:var(--bg2);cursor:pointer;transition:all .2s;text-align:left}
-.choice:hover{border-color:#333;background:var(--bg3);transform:translateY(-1px)}
-.choice-ico{font-size:26px;margin-bottom:6px}
-.choice-t{font-size:15px;font-weight:700}
-.choice-s{font-size:12px;color:var(--text2);margin-top:2px}
-
-.code-box{font-size:32px;font-weight:900;letter-spacing:8px;text-align:center;padding:16px;background:var(--bg3);border-radius:10px;border:1px solid var(--brd);cursor:pointer;margin:12px 0;transition:background .2s}
+.choice-wrap{display:flex;flex-direction:column;gap:12px;width:100%;max-width:340px}
+.choice{padding:20px 22px;border:1px solid var(--brd);border-radius:16px;background:var(--bg2);cursor:pointer;transition:all .2s;text-align:left}
+.choice:hover{border-color:#444;background:var(--bg3);transform:translateY(-2px)}
+.choice-ico{font-size:28px;margin-bottom:8px}
+.choice-t{font-size:16px;font-weight:700}
+.choice-s{font-size:12px;color:var(--text2);margin-top:3px}
+.code-box{font-size:34px;font-weight:900;letter-spacing:8px;text-align:center;padding:18px;background:var(--bg3);border-radius:12px;border:1px solid var(--brd);cursor:pointer;margin:14px 0;transition:background .2s;user-select:all}
 .code-box:hover{background:var(--bg4)}
-.code-hint{font-size:11px;color:var(--text3);text-align:center;margin-top:-6px;margin-bottom:12px}
+.code-hint{font-size:11px;color:var(--text3);text-align:center;margin-top:-8px;margin-bottom:14px}
 
 /* ROOM */
 #room{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .25s}
 #room.on{opacity:1;pointer-events:all}
 
-.tbar{height:44px;background:var(--bg2);border-bottom:1px solid var(--brd);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0}
-.tbar-logo{font-size:13px;font-weight:900;letter-spacing:-1px}
-.tbar-code{font-size:11px;font-weight:700;letter-spacing:3px;background:var(--bg3);padding:4px 10px;border-radius:6px;cursor:pointer;border:1px solid var(--brd);color:var(--text2)}
+/* TOPBAR */
+.tbar{height:46px;background:var(--bg2);border-bottom:1px solid var(--brd);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;z-index:10}
+.tbar-logo{font-size:13px;font-weight:900;letter-spacing:-1px;color:var(--text)}
+.tbar-code{font-size:11px;font-weight:700;letter-spacing:3px;background:var(--bg3);padding:5px 11px;border-radius:7px;cursor:pointer;border:1px solid var(--brd);color:var(--text2);transition:color .15s}
 .tbar-code:hover{color:var(--text)}
 .tbar-cnt{font-size:12px;color:var(--text3);margin-left:auto}
-.tbar-btn{padding:5px 12px;border:1px solid var(--brd);border-radius:7px;background:none;color:var(--text2);font-size:12px;cursor:pointer;transition:all .15s}
-.tbar-btn:hover{border-color:#444;color:var(--text)}
+.tbar-btn{padding:6px 14px;border:1px solid var(--brd);border-radius:8px;background:none;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;margin-left:6px}
+.tbar-btn:hover{border-color:#555;color:var(--text)}
 .tbar-btn.red{border-color:var(--red);color:var(--red)}
 
+/* ROOM BODY */
 .room-body{flex:1;display:flex;overflow:hidden;min-height:0}
 
-/* VIDEO */
-.vid-side{flex:1;display:flex;flex-direction:column;background:#000;min-width:0;position:relative}
+/* VIDEO PANEL */
+.vid-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden;min-width:0}
 video{width:100%;height:100%;object-fit:contain;display:block;background:#000}
 
-.vctrl{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.85));padding:16px 14px 12px;display:flex;align-items:center;gap:10px;opacity:0;transition:opacity .3s}
-.vid-side:hover .vctrl{opacity:1}
-.vbtn{background:none;border:none;color:#fff;font-size:18px;cursor:pointer;padding:4px 6px;border-radius:6px;transition:background .15s;line-height:1}
+/* VIDEO CONTROLS */
+.vctrl{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(transparent,rgba(0,0,0,.9) 60%);
+  padding:40px 16px 14px;
+  display:flex;flex-direction:column;gap:10px;
+  opacity:0;transition:opacity .3s;
+}
+.vid-panel.ctrl-show .vctrl{opacity:1}
+.vprog-wrap{width:100%;cursor:pointer;padding:6px 0;touch-action:none}
+.vprog{width:100%;height:4px;background:rgba(255,255,255,.2);border-radius:2px;position:relative;transition:height .15s}
+.vprog-wrap:hover .vprog,.vprog-wrap:active .vprog{height:6px}
+.vprog-fill{height:100%;background:#fff;border-radius:2px;pointer-events:none;position:relative}
+.vprog-fill::after{content:'';position:absolute;right:-6px;top:50%;transform:translateY(-50%);width:12px;height:12px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s}
+.vprog-wrap:hover .vprog-fill::after{opacity:1}
+.vbtns{display:flex;align-items:center;gap:6px}
+.vbtn{background:none;border:none;color:#fff;font-size:20px;cursor:pointer;padding:5px;border-radius:8px;transition:background .15s;line-height:1;display:flex;align-items:center;justify-content:center;min-width:36px;min-height:36px}
 .vbtn:hover{background:rgba(255,255,255,.15)}
-.vtime{font-size:11px;color:rgba(255,255,255,.7);font-weight:600;min-width:90px}
-.vprog{flex:1;height:4px;background:rgba(255,255,255,.2);border-radius:2px;cursor:pointer;position:relative}
-.vprog-fill{height:100%;background:#fff;border-radius:2px;pointer-events:none}
-.vsync{font-size:10px;font-weight:700;padding:3px 8px;border-radius:5px;background:rgba(34,197,94,.15);color:var(--grn);border:1px solid rgba(34,197,94,.25)}
+.vbtn:active{background:rgba(255,255,255,.25)}
+.vbtn svg{width:20px;height:20px;fill:currentColor}
+.vtime{font-size:12px;color:rgba(255,255,255,.8);font-weight:600;white-space:nowrap;margin:0 4px}
+.vsync{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;background:rgba(34,197,94,.2);color:var(--grn);border:1px solid rgba(34,197,94,.3);margin-left:auto}
+.vvol{width:70px;accent-color:#fff;cursor:pointer}
+
+/* TOUCH SKIP ZONES */
+.touch-skip{position:absolute;top:0;bottom:60px;width:30%;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;pointer-events:none}
+.touch-skip.active{opacity:1}
+.touch-skip-ico{font-size:28px;color:#fff;text-shadow:0 0 20px rgba(0,0,0,.8)}
+#touch-left{left:0;background:linear-gradient(to right,rgba(0,0,0,.3),transparent)}
+#touch-right{right:0;background:linear-gradient(to left,rgba(0,0,0,.3),transparent)}
 
 /* SIDEBAR */
-.chat-side{width:260px;flex-shrink:0;display:flex;flex-direction:column;border-left:1px solid var(--brd);background:var(--bg2)}
+.sidebar{width:270px;flex-shrink:0;display:flex;flex-direction:column;border-left:1px solid var(--brd);background:var(--bg2)}
 
 /* USERS */
-.users-wrap{padding:10px 12px;border-bottom:1px solid var(--brd);flex-shrink:0;max-height:160px;overflow-y:auto}
-.sec-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:7px}
+.users-wrap{padding:10px 12px;border-bottom:1px solid var(--brd);flex-shrink:0}
+.sec-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
 
 /* USER ROW */
-.urow{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--brd)}
-.urow:last-child{border-bottom:none}
-.udot{width:7px;height:7px;border-radius:50%;flex-shrink:0;background:var(--grn)}
-.urow.is-host .udot{background:var(--gold)}
-.urow.is-mod .udot{background:var(--blue)}
-.urow.is-muted .udot{background:var(--red)}
+.urow{display:flex;align-items:center;gap:7px;padding:6px 4px;border-radius:8px;transition:background .15s}
+.urow:hover{background:var(--bg3)}
+.udot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.udot-online{background:var(--grn)}
+.udot-host{background:var(--gold)}
+.udot-mod{background:var(--blue)}
+.udot-muted{background:var(--red)}
 .uname{flex:1;font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ubadge{font-size:9px;padding:2px 6px;border-radius:4px;font-weight:700;flex-shrink:0}
-.ubadge-host{background:rgba(245,158,11,.15);color:var(--gold)}
-.ubadge-mod{background:rgba(59,130,246,.15);color:var(--blue)}
-.ubadge-muted{background:rgba(239,68,68,.15);color:var(--red)}
-.uactions{display:flex;gap:3px;flex-shrink:0}
-.uact{background:none;border:none;cursor:pointer;font-size:13px;padding:2px 3px;border-radius:4px;transition:background .15s;line-height:1}
-.uact:hover{background:var(--bg4)}
+.ubadge{font-size:9px;padding:2px 7px;border-radius:5px;font-weight:700;flex-shrink:0;letter-spacing:.5px}
+.ub-host{background:rgba(245,158,11,.2);color:var(--gold);border:1px solid rgba(245,158,11,.3)}
+.ub-mod{background:rgba(59,130,246,.2);color:var(--blue);border:1px solid rgba(59,130,246,.3)}
+.ub-muted{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.25)}
+.uacts{display:flex;gap:2px;flex-shrink:0}
+.uact{
+  background:var(--bg4);border:1px solid var(--brd);
+  cursor:pointer;font-size:13px;padding:4px 7px;
+  border-radius:7px;transition:all .15s;line-height:1;color:var(--text2);
+}
+.uact:hover{background:var(--bg3);border-color:#555;color:var(--text)}
+.uact.uact-mute:hover{border-color:var(--red);color:var(--red)}
+.uact.uact-unmute:hover{border-color:var(--grn);color:var(--grn)}
+.uact.uact-kick:hover{border-color:var(--red);color:var(--red)}
+.uact.uact-mod:hover{border-color:var(--gold);color:var(--gold)}
+.uact.uact-unmod:hover{border-color:var(--text2);color:var(--text2)}
 
-/* MESSAGES */
-.msgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:5px;scrollbar-width:thin;scrollbar-color:var(--brd) transparent}
-.msg{display:flex;flex-direction:column;gap:1px}
-.msg-hdr{display:flex;align-items:baseline;gap:5px}
-.msg-name{font-size:11px;font-weight:700;color:var(--text2)}
-.msg-name.host-clr{color:var(--gold)}
-.msg-name.mod-clr{color:var(--blue)}
+/* CHAT */
+.msgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;scrollbar-width:thin;scrollbar-color:var(--brd) transparent}
+.msg{display:flex;flex-direction:column;gap:2px}
+.msg-hdr{display:flex;align-items:baseline;gap:6px}
+.msg-name{font-size:11px;font-weight:700}
+.msg-name.cn-host{color:var(--gold)}
+.msg-name.cn-mod{color:var(--blue)}
+.msg-name.cn-user{color:var(--text2)}
 .msg-time{font-size:9px;color:var(--text3)}
-.msg-txt{font-size:13px;line-height:1.5;word-break:break-word}
+.msg-txt{font-size:13px;line-height:1.55;word-break:break-word;color:var(--text)}
 .msg.sys .msg-txt{font-size:11px;color:var(--text3);font-style:italic}
-.muted-note{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:7px;padding:7px 10px;font-size:11px;color:var(--red);text-align:center;margin:6px}
+.muted-note{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:8px 12px;font-size:11px;color:var(--red);text-align:center;margin:6px 8px}
 
 .cinp-wrap{padding:10px;border-top:1px solid var(--brd);display:flex;gap:7px;flex-shrink:0}
-.cinp{flex:1;padding:9px 11px;border:1px solid var(--brd);border-radius:9px;background:var(--bg3);color:var(--text);font-size:13px;outline:none}
-.cinp:focus{border-color:#333}
+.cinp{flex:1;padding:10px 12px;border:1px solid var(--brd);border-radius:10px;background:var(--bg3);color:var(--text);font-size:13px;outline:none;transition:border-color .2s}
+.cinp:focus{border-color:#555}
 .cinp::placeholder{color:var(--text3)}
-.csend{padding:9px 13px;border:none;border-radius:9px;background:#fff;color:#000;font-size:13px;font-weight:700;cursor:pointer}
-.cinp:disabled,.csend:disabled{opacity:.35;cursor:not-allowed}
+.csend{padding:10px 14px;border:none;border-radius:10px;background:#fff;color:#000;font-size:14px;font-weight:700;cursor:pointer;transition:background .15s}
+.csend:hover{background:#e8e8e8}
+.cinp:disabled,.csend:disabled{opacity:.3;cursor:not-allowed}
 
-@media(max-width:600px){
-  .chat-side{position:fixed;bottom:0;left:0;right:0;width:100%;height:220px;border-left:none;border-top:1px solid var(--brd)}
-  .vid-side{padding-bottom:220px}
-  .vctrl{bottom:220px}
+/* MOBILE */
+@media(max-width:640px){
+  .sidebar{position:fixed;bottom:0;left:0;right:0;width:100%;height:200px;border-left:none;border-top:1px solid var(--brd)}
+  .vid-panel{padding-bottom:200px}
+  .vctrl{bottom:200px}
+  #touch-left,#touch-right{bottom:260px}
 }
 
-.notif{position:fixed;top:54px;left:50%;transform:translateX(-50%) translateY(-10px);background:var(--bg3);border:1px solid var(--brd);border-radius:9px;padding:9px 16px;font-size:13px;font-weight:600;z-index:200;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;max-width:320px;overflow:hidden;text-overflow:ellipsis}
+/* NOTIF */
+.notif{position:fixed;top:56px;left:50%;transform:translateX(-50%) translateY(-8px);background:var(--bg3);border:1px solid var(--brd);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;z-index:300;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;max-width:300px;overflow:hidden;text-overflow:ellipsis;box-shadow:0 4px 20px rgba(0,0,0,.4)}
 .notif.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
@@ -170,7 +204,7 @@ video{width:100%;height:100%;object-fit:contain;display:block;background:#000}
     <div class="card-s">Dostunun otaq kodunu daxil et</div>
     <input class="inp" id="j-name" placeholder="Adın" maxlength="20">
     <input class="inp" id="j-code" placeholder="Otaq kodu (məs. AB3X9)" maxlength="5"
-      style="text-transform:uppercase;letter-spacing:4px;font-weight:700;font-size:16px;text-align:center"
+      style="text-transform:uppercase;letter-spacing:4px;font-weight:700;font-size:18px;text-align:center"
       oninput="this.value=this.value.toUpperCase()">
     <div class="err" id="j-err"></div>
     <button class="btn btn-w" onclick="doJoin()">Qoşul →</button>
@@ -181,7 +215,7 @@ video{width:100%;height:100%;object-fit:contain;display:block;background:#000}
 <!-- WAIT -->
 <div class="screen off" id="scr-wait">
   <div class="card" style="text-align:center">
-    <div class="card-t" style="text-align:center">Otaq hazırdır!</div>
+    <div class="card-t" style="text-align:center">Otaq hazırdır! 🎉</div>
     <div class="card-s" style="text-align:center">Bu kodu dostuna göndər</div>
     <div class="code-box" id="show-code" onclick="copyCode()">-----</div>
     <div class="code-hint">Kopyalamaq üçün koda tıkla</div>
@@ -192,31 +226,67 @@ video{width:100%;height:100%;object-fit:contain;display:block;background:#000}
 
 <!-- ROOM -->
 <div id="room">
+  <!-- TOPBAR -->
   <div class="tbar">
     <div class="tbar-logo">WC</div>
     <div class="tbar-code" id="tbar-code" onclick="copyCode()">-----</div>
     <div class="tbar-cnt" id="tbar-cnt">0 izləyir</div>
     <button class="tbar-btn" id="leave-btn" onclick="leaveRoom()">Çıx</button>
   </div>
+
   <div class="room-body">
-    <div class="vid-side" id="vid-side">
+    <!-- VIDEO -->
+    <div class="vid-panel" id="vid-panel">
       <video id="vid" preload="metadata"></video>
-      <div class="vctrl">
-        <button class="vbtn" id="play-btn" onclick="togglePlay()">▶</button>
-        <div class="vtime" id="vtime">0:00 / 0:00</div>
-        <div class="vprog" id="vprog" onclick="seekClick(event)">
-          <div class="vprog-fill" id="vprog-fill" style="width:0%"></div>
+
+      <!-- Touch skip zones -->
+      <div class="touch-skip" id="touch-left"><div class="touch-skip-ico">⏪ 10s</div></div>
+      <div class="touch-skip" id="touch-right"><div class="touch-skip-ico">10s ⏩</div></div>
+
+      <!-- Controls -->
+      <div class="vctrl" id="vctrl">
+        <!-- Progress bar -->
+        <div class="vprog-wrap" id="vprog-wrap">
+          <div class="vprog" id="vprog">
+            <div class="vprog-fill" id="vprog-fill" style="width:0%"></div>
+          </div>
         </div>
-        <div class="vsync">● CANLI</div>
+        <!-- Buttons row -->
+        <div class="vbtns">
+          <!-- Play/Pause -->
+          <button class="vbtn" id="play-btn" onclick="togglePlay()" title="Oynat/Dayan">
+            <svg id="play-ico" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <!-- -10s -->
+          <button class="vbtn" onclick="skipSec(-10)" title="-10 saniyə">
+            <svg viewBox="0 0 24 24"><path d="M12.5 3a9 9 0 1 0 6.5 15.6L17.5 17A7 7 0 1 1 12.5 5V3z"/><path d="M12.5 3v5l4-2.5z"/><text x="8" y="15" font-size="6" fill="currentColor" font-family="sans-serif" font-weight="bold">10</text></svg>
+          </button>
+          <!-- +10s -->
+          <button class="vbtn" onclick="skipSec(10)" title="+10 saniyə">
+            <svg viewBox="0 0 24 24"><path d="M11.5 3a9 9 0 1 1-6.5 15.6L6.5 17A7 7 0 1 0 11.5 5V3z"/><path d="M11.5 3v5l-4-2.5z"/><text x="8" y="15" font-size="6" fill="currentColor" font-family="sans-serif" font-weight="bold">10</text></svg>
+          </button>
+          <!-- Time -->
+          <div class="vtime" id="vtime">0:00 / 0:00</div>
+          <!-- Volume -->
+          <input type="range" class="vvol" id="vvol" min="0" max="1" step="0.05" value="1" oninput="setVol(this.value)" title="Səs">
+          <!-- Sync badge -->
+          <div class="vsync">● CANLI</div>
+          <!-- Fullscreen -->
+          <button class="vbtn" onclick="toggleFS()" title="Tam ekran" id="fs-btn">
+            <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+          </button>
+        </div>
       </div>
     </div>
-    <div class="chat-side">
+
+    <!-- SIDEBAR -->
+    <div class="sidebar">
       <div class="users-wrap">
         <div class="sec-lbl">Otaqda</div>
         <div id="users-list"></div>
       </div>
       <div class="msgs" id="msgs"></div>
-      <div id="muted-note" class="muted-note" style="display:none">Siz susturuldunuz</div>
+      <div id="muted-note" class="muted-note" style="display:none">🔇 Siz susturuldunuz</div>
       <div class="cinp-wrap">
         <input class="cinp" id="cinp" placeholder="Bir şey yazın..." maxlength="200" onkeydown="if(event.key==='Enter')sendMsg()">
         <button class="csend" id="csend" onclick="sendMsg()">↑</button>
@@ -238,26 +308,28 @@ firebase.initializeApp({
   messagingSenderId:"26858068381",
   appId:"1:26858068381:web:ca25def077d681ca23f774"
 });
-const db = firebase.database();
+const db=firebase.database();
 
 // STATE
 let me={name:'',id:'',host:false,mod:false};
 let room={code:'',url:''};
 let rRef=null,uRef=null,cRef=null,vRef=null;
-let offs=[], isMuted=false, syncCd=false, vidReady=false;
+let offs=[],isMuted=false,syncCd=false,vidReady=false;
+let ctrlTimer=null;
 const vid=document.getElementById('vid');
+const vidPanel=document.getElementById('vid-panel');
 
 const $=id=>document.getElementById(id);
 function genCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';return Array.from({length:5},()=>c[Math.floor(Math.random()*c.length)]).join('');}
 function genId(){return Math.random().toString(36).slice(2,10);}
-function fmt(s){s=Math.floor(s||0);return Math.floor(s/60)+':'+(s%60<10?'0':'')+s%60;}
+function fmt(s){s=Math.floor(s||0);const m=Math.floor(s/60);return m+':'+(s%60<10?'0':'')+s%60;}
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 function canManage(){return me.host||me.mod;}
 
 // SCREENS
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.add('off'));
-  if($(id)) $(id).classList.remove('off');
+  if($(id))$(id).classList.remove('off');
 }
 
 // NOTIF
@@ -266,10 +338,97 @@ function notif(msg,dur=3000){
   const el=$('notif');el.textContent=msg;el.classList.add('show');
   clearTimeout(nT);nT=setTimeout(()=>el.classList.remove('show'),dur);
 }
-
 function copyCode(){
   navigator.clipboard.writeText(room.code).then(()=>notif('📋 Kod kopyalandı: '+room.code));
 }
+
+// VIDEO CONTROLS SHOW/HIDE
+function showCtrl(){
+  vidPanel.classList.add('ctrl-show');
+  clearTimeout(ctrlTimer);
+  ctrlTimer=setTimeout(()=>vidPanel.classList.remove('ctrl-show'),3000);
+}
+
+// Mouse move on desktop
+vidPanel.addEventListener('mousemove',showCtrl);
+vidPanel.addEventListener('mouseleave',()=>{
+  clearTimeout(ctrlTimer);
+  vidPanel.classList.remove('ctrl-show');
+});
+
+// Touch on mobile — single tap shows controls, double tap areas skip
+let lastTap=0,tapTimer=null;
+vidPanel.addEventListener('touchstart',e=>{
+  const now=Date.now();
+  const x=e.touches[0].clientX;
+  const w=vidPanel.offsetWidth;
+  if(now-lastTap<300){
+    // Double tap
+    clearTimeout(tapTimer);
+    if(x<w*0.35){
+      skipSec(-10);
+      showTouchSkip('left');
+    } else if(x>w*0.65){
+      skipSec(10);
+      showTouchSkip('right');
+    } else {
+      togglePlay();
+    }
+  } else {
+    tapTimer=setTimeout(()=>showCtrl(),0);
+  }
+  lastTap=now;
+},{passive:true});
+
+function showTouchSkip(side){
+  const el=$(side==='left'?'touch-left':'touch-right');
+  el.classList.add('active');
+  setTimeout(()=>el.classList.remove('active'),600);
+}
+
+// PROGRESS BAR drag
+let isDragging=false;
+const vprogWrap=$('vprog-wrap');
+function seekTo(e){
+  const rect=vprogWrap.getBoundingClientRect();
+  const x=(e.clientX||e.touches?.[0]?.clientX||0)-rect.left;
+  const pct=Math.max(0,Math.min(1,x/rect.width));
+  const t=pct*(vid.duration||0);
+  if(canManage()){
+    vid.currentTime=t;
+    pushVid();
+  } else {
+    notif('Yalnız host/idarəçi idarə edə bilər');
+  }
+}
+vprogWrap.addEventListener('mousedown',e=>{isDragging=true;seekTo(e);});
+document.addEventListener('mousemove',e=>{if(isDragging)seekTo(e);});
+document.addEventListener('mouseup',()=>isDragging=false);
+vprogWrap.addEventListener('touchstart',e=>{isDragging=true;seekTo(e);},{passive:true});
+document.addEventListener('touchmove',e=>{if(isDragging)seekTo(e);},{passive:true});
+document.addEventListener('touchend',()=>isDragging=false);
+
+// VOLUME
+function setVol(v){vid.volume=parseFloat(v);}
+
+// FULLSCREEN
+function toggleFS(){
+  if(!document.fullscreenElement){
+    vidPanel.requestFullscreen?.()
+    ||vidPanel.webkitRequestFullscreen?.();
+  } else {
+    document.exitFullscreen?.()
+    ||document.webkitExitFullscreen?.();
+  }
+}
+document.addEventListener('fullscreenchange',()=>{
+  const ico=$('fs-btn').querySelector('svg');
+  if(document.fullscreenElement){
+    ico.innerHTML='<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>';
+  } else {
+    ico.innerHTML='<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
+  }
+});
 
 // CREATE
 async function doCreate(){
@@ -284,20 +443,10 @@ async function doCreate(){
   await rRef.set({hostId:me.id,url,video:{playing:false,time:0,at:Date.now()},created:Date.now()});
   rRef.onDisconnect().remove();
   $('show-code').textContent=room.code;
-  go('scr-wait');
-  err.textContent='';
+  go('scr-wait');err.textContent='';
 }
-
-async function enterRoom(){
-  await _joinData();
-  startRoom();
-}
-
-function cancelRoom(){
-  if(rRef)rRef.remove();
-  rRef=null;
-  go('scr-home');
-}
+async function enterRoom(){await _joinData();startRoom();}
+function cancelRoom(){if(rRef)rRef.remove();rRef=null;go('scr-home');}
 
 // JOIN
 async function doJoin(){
@@ -311,10 +460,8 @@ async function doJoin(){
   me={name,id:genId(),host:false,mod:false};
   room={code,url:snap.val().url};
   rRef=db.ref('rooms/'+code);
-  vRef=db.ref('rooms/'+code+'/video');
   await _joinData();
-  err.textContent='';
-  startRoom();
+  err.textContent='';startRoom();
 }
 
 async function _joinData(){
@@ -328,13 +475,9 @@ async function _joinData(){
 // START ROOM
 function startRoom(){
   $('tbar-code').textContent=room.code;
-  if(me.host){
-    $('leave-btn').textContent='Otağı bitir';
-    $('leave-btn').classList.add('red');
-  }
+  if(me.host){$('leave-btn').textContent='Otağı bitir';$('leave-btn').classList.add('red');}
 
-  vid.src=room.url;
-  vid.load();
+  vid.src=room.url;vid.load();
   vid.addEventListener('loadedmetadata',()=>{vidReady=true;syncFromDB();});
   vid.addEventListener('timeupdate',updTime);
   vid.addEventListener('play',()=>{if(!syncCd&&canManage())pushVid();});
@@ -352,7 +495,6 @@ function startRoom(){
     $('tbar-cnt').textContent=Object.keys(u).length+' izləyir';
     const myData=u[me.id];
     if(myData){
-      // Update my mod status from DB
       me.mod=!!myData.mod;
       isMuted=!!myData.muted;
       $('muted-note').style.display=isMuted?'block':'none';
@@ -372,13 +514,10 @@ function startRoom(){
   offs.push(()=>rRef.off('value',rl));
 
   // Chat
-  cRef=db.ref('rooms/'+room.code+'/chat');
   const cl=cRef.limitToLast(150).on('child_added',snap=>appendMsg(snap.val()));
   offs.push(()=>cRef.off('child_added',cl));
 
-  if(!me.host){
-    cRef.push({sys:true,text:me.name+' otağa qoşuldu',ts:Date.now()});
-  }
+  if(!me.host)cRef.push({sys:true,text:me.name+' otağa qoşuldu',ts:Date.now()});
 
   $('room').classList.add('on');
   go('__none__');
@@ -390,10 +529,10 @@ function applyVid(v){
   const elapsed=(Date.now()-v.at)/1000;
   const target=v.time+(v.playing?elapsed:0);
   syncCd=true;
-  if(Math.abs(vid.currentTime-target)>2) vid.currentTime=Math.max(0,target);
-  if(v.playing&&vid.paused) vid.play().catch(()=>{});
-  else if(!v.playing&&!vid.paused) vid.pause();
-  $('play-btn').textContent=v.playing?'⏸':'▶';
+  if(Math.abs(vid.currentTime-target)>2)vid.currentTime=Math.max(0,target);
+  if(v.playing&&vid.paused)vid.play().catch(()=>{});
+  else if(!v.playing&&!vid.paused)vid.pause();
+  updatePlayBtn(!v.playing);
   setTimeout(()=>syncCd=false,600);
 }
 function syncFromDB(){vRef.get().then(s=>{if(s.exists())applyVid(s.val());});}
@@ -402,100 +541,104 @@ function pushVid(){
   vRef.set({playing:!vid.paused,time:vid.currentTime,at:Date.now()});
 }
 function togglePlay(){
-  if(!canManage()){notif('Yalnız host və idarəçi idarə edə bilər');return;}
+  if(!canManage()){notif('Yalnız host/idarəçi idarə edə bilər');return;}
   if(vid.paused)vid.play().catch(()=>{});else vid.pause();
 }
-function seekClick(e){
-  if(!canManage()){notif('Yalnız host və idarəçi idarə edə bilər');return;}
-  const pct=e.offsetX/$('vprog').offsetWidth;
-  vid.currentTime=pct*(vid.duration||0);
+function skipSec(s){
+  if(!canManage()){notif('Yalnız host/idarəçi idarə edə bilər');return;}
+  vid.currentTime=Math.max(0,Math.min(vid.duration||0,vid.currentTime+s));
+  pushVid();
+  notif((s>0?'+':'')+s+' saniyə');
+}
+function updatePlayBtn(paused){
+  const ico=$('play-ico');
+  ico.innerHTML=paused
+    ?'<path d="M8 5v14l11-7z"/>'
+    :'<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
 }
 function updTime(){
   const c=vid.currentTime,d=vid.duration||0;
   $('vtime').textContent=fmt(c)+' / '+fmt(d);
   $('vprog-fill').style.width=(d?c/d*100:0)+'%';
-  $('play-btn').textContent=vid.paused?'▶':'⏸';
+  updatePlayBtn(vid.paused);
 }
 
-// USERS RENDER
+// USERS
 function renderUsers(users){
-  const list=$('users-list');
-  list.innerHTML=Object.values(users).map(u=>{
+  $('users-list').innerHTML=Object.values(users).map(u=>{
     const isMe=u.id===me.id;
     const canAct=canManage()&&!u.host&&!isMe;
-    let badge='';
-    if(u.host) badge=`<span class="ubadge ubadge-host">HOST</span>`;
-    else if(u.mod) badge=`<span class="ubadge ubadge-mod">MOD</span>`;
-    else if(u.muted) badge=`<span class="ubadge ubadge-muted">SUSTURULUB</span>`;
 
+    // Dot color
+    let dotClass='udot ';
+    if(u.host) dotClass+='udot-host';
+    else if(u.mod) dotClass+='udot-mod';
+    else if(u.muted) dotClass+='udot-muted';
+    else dotClass+='udot-online';
+
+    // Badge
+    let badge='';
+    if(u.host) badge='<span class="ubadge ub-host">HOST</span>';
+    else if(u.mod) badge='<span class="ubadge ub-mod">MOD</span>';
+    else if(u.muted) badge='<span class="ubadge ub-muted">MUTED</span>';
+
+    // Actions
     let acts='';
     if(canAct){
-      // Mute/unmute toggle
       if(u.muted){
-        acts+=`<button class="uact" onclick="unmuteUser('${u.id}','${esc(u.name)}')" title="Susturmağı aç">🔊</button>`;
+        acts+=`<button class="uact uact-unmute" onclick="unmuteUser('${u.id}','${esc(u.name)}')" title="Susturmağı aç">🔊</button>`;
       } else {
-        acts+=`<button class="uact" onclick="muteUser('${u.id}','${esc(u.name)}')" title="Sustur">🔇</button>`;
+        acts+=`<button class="uact uact-mute" onclick="muteUser('${u.id}','${esc(u.name)}')" title="Sustur">🔇</button>`;
       }
-      // Kick
-      acts+=`<button class="uact" onclick="kickUser('${u.id}','${esc(u.name)}')" title="Çıxart">✕</button>`;
-      // Mod toggle — only host can give/remove mod
+      acts+=`<button class="uact uact-kick" onclick="kickUser('${u.id}','${esc(u.name)}')" title="Çıxart">✕</button>`;
       if(me.host){
         if(u.mod){
-          acts+=`<button class="uact" onclick="removeMod('${u.id}','${esc(u.name)}')" title="İdarəçiliyi geri al">⭐</button>`;
+          acts+=`<button class="uact uact-unmod" onclick="removeMod('${u.id}','${esc(u.name)}')" title="Mod sil">⭐</button>`;
         } else {
-          acts+=`<button class="uact" onclick="giveMod('${u.id}','${esc(u.name)}')" title="İdarəçi et">☆</button>`;
+          acts+=`<button class="uact uact-mod" onclick="giveMod('${u.id}','${esc(u.name)}')" title="Mod ver">☆</button>`;
         }
       }
     }
 
-    let rowClass='urow';
-    if(u.host) rowClass+=' is-host';
-    else if(u.mod) rowClass+=' is-mod';
-    else if(u.muted) rowClass+=' is-muted';
-
-    return `<div class="${rowClass}">
-      <div class="udot"></div>
+    return `<div class="urow ${u.host?'is-host':u.mod?'is-mod':''}">
+      <div class="${dotClass}"></div>
       <div class="uname">${esc(u.name)}${isMe?' (sən)':''}</div>
       ${badge}
-      <div class="uactions">${acts}</div>
+      <div class="uacts">${acts}</div>
     </div>`;
   }).join('');
 }
 
-// HOST ACTIONS
-function kickUser(uid,uname){
+// ACTIONS
+function kickUser(uid,un){
   if(!canManage())return;
   db.ref('rooms/'+room.code+'/users/'+uid).remove();
-  cRef.push({sys:true,text:uname+' otaqdan çıxarıldı',ts:Date.now()});
-  notif('🚫 '+uname+' çıxarıldı');
+  cRef.push({sys:true,text:un+' otaqdan çıxarıldı',ts:Date.now()});
+  notif('🚫 '+un+' çıxarıldı');
 }
-
-function muteUser(uid,uname){
+function muteUser(uid,un){
   if(!canManage())return;
   db.ref('rooms/'+room.code+'/users/'+uid+'/muted').set(true);
-  cRef.push({sys:true,text:uname+' susturuldu',ts:Date.now()});
-  notif('🔇 '+uname+' susturuldu');
+  cRef.push({sys:true,text:un+' susturuldu 🔇',ts:Date.now()});
+  notif('🔇 '+un+' susturuldu');
 }
-
-function unmuteUser(uid,uname){
+function unmuteUser(uid,un){
   if(!canManage())return;
   db.ref('rooms/'+room.code+'/users/'+uid+'/muted').set(false);
-  cRef.push({sys:true,text:uname+' susturmadan çıxarıldı',ts:Date.now()});
-  notif('🔊 '+uname+' susturmadan çıxarıldı');
+  cRef.push({sys:true,text:un+' susturmadan çıxarıldı 🔊',ts:Date.now()});
+  notif('🔊 '+un+' susturmadan çıxarıldı');
 }
-
-function giveMod(uid,uname){
+function giveMod(uid,un){
   if(!me.host)return;
   db.ref('rooms/'+room.code+'/users/'+uid+'/mod').set(true);
-  cRef.push({sys:true,text:uname+' idarəçi oldu 🌟',ts:Date.now()});
-  notif('⭐ '+uname+' idarəçi edildi');
+  cRef.push({sys:true,text:un+' idarəçi oldu 🌟',ts:Date.now()});
+  notif('⭐ '+un+' idarəçi edildi');
 }
-
-function removeMod(uid,uname){
+function removeMod(uid,un){
   if(!me.host)return;
   db.ref('rooms/'+room.code+'/users/'+uid+'/mod').set(false);
-  cRef.push({sys:true,text:uname+' idarəçilikdən çıxarıldı',ts:Date.now()});
-  notif('❌ '+uname+' idarəçilikdən çıxarıldı');
+  cRef.push({sys:true,text:un+' idarəçilikdən çıxarıldı',ts:Date.now()});
+  notif('❌ '+un+' idarəçilikdən çıxarıldı');
 }
 
 // CHAT
@@ -505,7 +648,6 @@ function sendMsg(){
   cRef.push({name:me.name,id:me.id,host:me.host,mod:me.mod,text:txt,ts:Date.now()});
   inp.value='';
 }
-
 function appendMsg(m){
   const box=$('msgs');
   const d=document.createElement('div');
@@ -514,18 +656,16 @@ function appendMsg(m){
     d.className='msg sys';
     d.innerHTML=`<div class="msg-txt">— ${esc(m.text)}</div>`;
   } else {
-    const nameClass=m.host?'host-clr':m.mod?'mod-clr':'';
+    const nc=m.host?'cn-host':m.mod?'cn-mod':'cn-user';
     const badge=m.host?' 👑':m.mod?' 🌟':'';
     d.className='msg';
     d.innerHTML=`<div class="msg-hdr">
-      <span class="msg-name ${nameClass}">${esc(m.name)}${badge}</span>
+      <span class="msg-name ${nc}">${esc(m.name)}${badge}</span>
       <span class="msg-time">${time}</span>
-    </div>
-    <div class="msg-txt">${esc(m.text)}</div>`;
-    if(m.id!==me.id) notif('💬 '+m.name+': '+m.text.slice(0,40),2000);
+    </div><div class="msg-txt">${esc(m.text)}</div>`;
+    if(m.id!==me.id)notif('💬 '+m.name+': '+m.text.slice(0,40),2000);
   }
-  box.appendChild(d);
-  box.scrollTop=box.scrollHeight;
+  box.appendChild(d);box.scrollTop=box.scrollHeight;
 }
 
 // LEAVE
@@ -534,19 +674,16 @@ function leaveRoom(){
     if(!confirm('Otağı hamı üçün bitirmək istəyirsən?'))return;
     rRef.remove();
   } else {
-    if(cRef) cRef.push({sys:true,text:me.name+' otaqdan ayrıldı',ts:Date.now()});
-    if(uRef) uRef.remove();
+    if(cRef)cRef.push({sys:true,text:me.name+' otaqdan ayrıldı',ts:Date.now()});
+    if(uRef)uRef.remove();
   }
-  cleanup();
-  go('scr-home');
+  cleanup();go('scr-home');
 }
-
 function cleanup(){
   offs.forEach(f=>f());offs=[];
   vid.src='';vidReady=false;isMuted=false;
   rRef=uRef=cRef=vRef=null;
-  me={name:'',id:'',host:false,mod:false};
-  room={code:'',url:''};
+  me={name:'',id:'',host:false,mod:false};room={code:'',url:''};
   $('msgs').innerHTML='';$('users-list').innerHTML='';
   $('room').classList.remove('on');
   $('leave-btn').textContent='Çıx';
