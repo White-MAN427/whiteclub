@@ -14,7 +14,7 @@
 }
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
 
-/* ── COVER ── */
+/* SCREENS */
 .screen{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;transition:opacity .25s}
 .screen.off{opacity:0;pointer-events:none}
 .logo{font-size:42px;font-weight:900;letter-spacing:-2px}
@@ -44,12 +44,10 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .code-box:hover{background:var(--bg4)}
 .code-hint{font-size:11px;color:var(--text3);text-align:center;margin-top:-8px;margin-bottom:14px}
 
-/* ── ROOM ── */
+/* ROOM */
 #room{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .25s;background:#000}
 #room.on{opacity:1;pointer-events:all}
-
-/* TOPBAR */
-.tbar{height:48px;background:rgba(0,0,0,.95);border-bottom:1px solid var(--brd);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;z-index:20;backdrop-filter:blur(10px)}
+.tbar{height:48px;background:rgba(10,10,10,.98);border-bottom:1px solid var(--brd);display:flex;align-items:center;padding:0 14px;gap:10px;flex-shrink:0;z-index:20}
 .tbar-logo{font-size:14px;font-weight:900;letter-spacing:-1px}
 .tbar-code{font-size:12px;font-weight:700;letter-spacing:3px;background:var(--bg3);padding:5px 12px;border-radius:8px;cursor:pointer;border:1px solid var(--brd);color:var(--text2);transition:color .15s}
 .tbar-code:hover{color:var(--text)}
@@ -57,77 +55,74 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .tbar-btn{padding:7px 15px;border:1px solid var(--brd);border-radius:8px;background:none;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;margin-left:8px;transition:all .15s}
 .tbar-btn:hover{border-color:#555;color:var(--text)}
 .tbar-btn.red{border-color:var(--red);color:var(--red)}
-
-/* BODY */
 .room-body{flex:1;display:flex;overflow:hidden;min-height:0}
 
-/* ── VIDEO PANEL (YouTube style) ── */
-.vid-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden;min-width:0;cursor:pointer}
+/* VIDEO */
+.vid-panel{flex:1;display:flex;flex-direction:column;background:#000;position:relative;overflow:hidden;min-width:0}
 video{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none}
 
-/* GRADIENT OVERLAY */
-.vid-overlay{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end}
+/* BUFFERING SPINNER */
+.buf-spinner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:48px;height:48px;border:3px solid rgba(255,255,255,.2);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
+.buf-spinner.show{display:block}
+@keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 
-/* YOUTUBE-STYLE CONTROLS */
-.vctrl{
-  background:linear-gradient(transparent,rgba(0,0,0,.75) 50%,rgba(0,0,0,.95));
-  padding:0 12px 10px;
-  opacity:0;transition:opacity .3s;
-  pointer-events:none;
-}
-.vid-panel.ctrl-show .vctrl{opacity:1;pointer-events:all}
+/* CENTER FLASH */
+.center-ico{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:56px;pointer-events:none;opacity:0;transition:opacity .15s;filter:drop-shadow(0 2px 8px rgba(0,0,0,.6))}
+.center-ico.show{opacity:1}
 
-/* PROGRESS BAR */
-.prog-area{padding:8px 0 4px;cursor:pointer;touch-action:none}
-.prog-track{height:3px;background:rgba(255,255,255,.25);border-radius:2px;position:relative;transition:height .1s}
-.prog-area:hover .prog-track,.prog-area.dragging .prog-track{height:5px}
-.prog-fill{height:100%;background:#fff;border-radius:2px;position:relative;pointer-events:none}
-.prog-thumb{position:absolute;right:-6px;top:50%;transform:translateY(-50%);width:13px;height:13px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;pointer-events:none}
-.prog-area:hover .prog-thumb,.prog-area.dragging .prog-thumb{opacity:1}
-.prog-buffered{position:absolute;top:0;left:0;height:100%;background:rgba(255,255,255,.35);border-radius:2px;pointer-events:none}
+/* DOUBLE TAP */
+.dtap{position:absolute;top:0;bottom:60px;width:35%;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .2s}
+.dtap.left{left:0;background:radial-gradient(ellipse at left,rgba(255,255,255,.1),transparent 70%)}
+.dtap.right{right:0;background:radial-gradient(ellipse at right,rgba(255,255,255,.1),transparent 70%)}
+.dtap.show{opacity:1}
+.dtap-inner{display:flex;flex-direction:column;align-items:center;gap:6px}
+.dtap-circle{width:60px;height:60px;border-radius:50%;border:2px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:22px}
+.dtap-lbl{font-size:12px;color:#fff;font-weight:700;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+
+/* CONTROLS */
+.vctrl{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.6) 30%,rgba(0,0,0,.92));padding:0 12px 12px;opacity:0;transition:opacity .3s;pointer-events:none}
+.vid-panel.cs .vctrl{opacity:1;pointer-events:all}
+
+/* PROGRESS */
+.prog-wrap{padding:10px 0 6px;cursor:pointer;touch-action:none}
+.prog-track{height:3px;background:rgba(255,255,255,.2);border-radius:3px;position:relative;transition:height .15s}
+.prog-wrap:hover .prog-track,.prog-wrap.drag .prog-track{height:6px}
+.prog-buf{position:absolute;top:0;left:0;height:100%;background:rgba(255,255,255,.35);border-radius:3px;pointer-events:none}
+.prog-fill{position:absolute;top:0;left:0;height:100%;background:#fff;border-radius:3px;pointer-events:none}
+.prog-thumb{position:absolute;top:50%;right:-7px;transform:translateY(-50%);width:14px;height:14px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.prog-wrap:hover .prog-thumb,.prog-wrap.drag .prog-thumb{opacity:1}
 
 /* CTRL ROW */
-.ctrl-row{display:flex;align-items:center;gap:4px}
-.vbtn{background:none;border:none;color:#fff;cursor:pointer;padding:6px;border-radius:8px;transition:background .15s;line-height:1;display:flex;align-items:center;justify-content:center;min-width:40px;min-height:40px;flex-shrink:0}
-.vbtn:hover{background:rgba(255,255,255,.12)}
+.ctrl-row{display:flex;align-items:center;gap:2px}
+.vbtn{background:none;border:none;color:#fff;cursor:pointer;padding:7px;border-radius:8px;transition:background .15s;display:flex;align-items:center;justify-content:center;min-width:42px;min-height:42px}
+.vbtn:hover{background:rgba(255,255,255,.1)}
 .vbtn:active{background:rgba(255,255,255,.2)}
 .vbtn svg{width:22px;height:22px;fill:currentColor}
-.vtime{font-size:13px;color:#fff;font-weight:500;white-space:nowrap;margin:0 4px}
+.vtime{font-size:13px;color:rgba(255,255,255,.9);font-weight:600;white-space:nowrap;margin:0 6px;letter-spacing:.3px}
 .spacer{flex:1}
+.sync-badge{font-size:10px;font-weight:700;padding:4px 10px;border-radius:6px;background:rgba(34,197,94,.15);color:var(--grn);border:1px solid rgba(34,197,94,.3);letter-spacing:.5px;white-space:nowrap}
+.sync-badge.warn{background:rgba(245,158,11,.15);color:var(--gold);border-color:rgba(245,158,11,.3)}
+.sync-badge.bad{background:rgba(239,68,68,.15);color:var(--red);border-color:rgba(239,68,68,.3)}
 
-/* SPEED MENU */
+/* SPEED */
 .speed-wrap{position:relative}
-.speed-btn{font-size:12px;font-weight:700;padding:6px 10px;min-width:auto;letter-spacing:.5px}
-.speed-menu{position:absolute;bottom:calc(100% + 8px);right:0;background:rgba(20,20,20,.97);border:1px solid var(--brd);border-radius:12px;padding:6px;min-width:120px;display:none;backdrop-filter:blur(10px);z-index:10}
+.speed-btn{font-size:12px;font-weight:700;letter-spacing:.5px;min-width:auto;padding:7px 10px}
+.speed-menu{position:absolute;bottom:calc(100% + 8px);right:0;background:rgba(15,15,15,.98);border:1px solid var(--brd);border-radius:12px;padding:6px;min-width:110px;display:none;backdrop-filter:blur(10px);z-index:30;box-shadow:0 4px 20px rgba(0,0,0,.6)}
 .speed-menu.open{display:block}
 .speed-opt{padding:8px 14px;font-size:13px;font-weight:500;border-radius:8px;cursor:pointer;transition:background .15s;color:var(--text2)}
 .speed-opt:hover{background:var(--bg4);color:var(--text)}
-.speed-opt.active{color:#fff;font-weight:700}
+.speed-opt.on{color:#fff;font-weight:700}
 
 /* VOLUME */
-.vol-wrap{display:flex;align-items:center;gap:6px}
-.vol-slider{width:60px;accent-color:#fff;cursor:pointer;display:none}
-.vol-wrap:hover .vol-slider,.vol-wrap:focus-within .vol-slider{display:block}
+.vol-group{display:flex;align-items:center;gap:4px}
+.vol-sl{width:0;overflow:hidden;accent-color:#fff;cursor:pointer;transition:width .2s;opacity:0}
+.vol-group:hover .vol-sl,.vol-group:focus-within .vol-sl{width:64px;opacity:1}
 
-/* DOUBLE TAP INDICATORS */
-.dtap{position:absolute;top:50%;transform:translateY(-50%);pointer-events:none;opacity:0;transition:opacity .2s;display:flex;flex-direction:column;align-items:center;gap:6px}
-.dtap.left{left:10%}
-.dtap.right{right:10%}
-.dtap.show{opacity:1}
-.dtap-circle{width:70px;height:70px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:28px}
-.dtap-lbl{font-size:12px;color:#fff;font-weight:600;text-shadow:0 1px 4px rgba(0,0,0,.8)}
-
-/* CENTER PLAY INDICATOR */
-.center-ico{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);pointer-events:none;opacity:0;transition:opacity .2s;font-size:60px}
-.center-ico.show{opacity:1}
-
-/* ── SIDEBAR ── */
-.sidebar{width:270px;flex-shrink:0;display:flex;flex-direction:column;border-left:1px solid var(--brd);background:var(--bg2)}
-
-/* USERS */
-.users-wrap{padding:10px 12px;border-bottom:1px solid var(--brd);flex-shrink:0;max-height:180px;overflow-y:auto}
+/* SIDEBAR */
+.sidebar{width:268px;flex-shrink:0;display:flex;flex-direction:column;border-left:1px solid var(--brd);background:var(--bg2)}
+.users-wrap{padding:10px 12px;border-bottom:1px solid var(--brd);flex-shrink:0;max-height:190px;overflow-y:auto}
 .sec-lbl{font-size:9px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
-.urow{display:flex;align-items:center;gap:7px;padding:5px 4px;border-radius:8px}
+.urow{display:flex;align-items:center;gap:7px;padding:5px 4px;border-radius:8px;transition:background .1s}
 .urow:hover{background:var(--bg3)}
 .udot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 .uname{flex:1;font-size:12px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -135,24 +130,21 @@ video{width:100%;height:100%;object-fit:contain;display:block;pointer-events:non
 .ub-host{background:rgba(245,158,11,.2);color:var(--gold);border:1px solid rgba(245,158,11,.3)}
 .ub-mod{background:rgba(59,130,246,.2);color:var(--blue);border:1px solid rgba(59,130,246,.3)}
 .ub-muted{background:rgba(239,68,68,.15);color:var(--red);border:1px solid rgba(239,68,68,.25)}
-.uacts{display:flex;gap:3px}
-.uact{background:var(--bg4);border:1px solid var(--brd);cursor:pointer;font-size:12px;padding:4px 8px;border-radius:7px;transition:all .15s;color:var(--text2);font-weight:600}
+.uacts{display:flex;gap:3px;flex-shrink:0}
+.uact{background:var(--bg4);border:1px solid var(--brd);cursor:pointer;font-size:13px;padding:4px 8px;border-radius:7px;transition:all .15s;color:var(--text2)}
 .uact:hover{border-color:#555;color:var(--text)}
-.uact.a-mute:hover{border-color:var(--red);color:var(--red)}
-.uact.a-unmute:hover{border-color:var(--grn);color:var(--grn)}
-.uact.a-kick:hover{border-color:var(--red);color:var(--red)}
-.uact.a-mod:hover{border-color:var(--gold);color:var(--gold)}
+.uact.km:hover{border-color:var(--red);color:var(--red)}
+.uact.ku:hover{border-color:var(--grn);color:var(--grn)}
+.uact.kd:hover{border-color:var(--gold);color:var(--gold)}
 
 /* CHAT */
 .msgs{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;scrollbar-width:thin;scrollbar-color:var(--brd) transparent}
 .msg{display:flex;flex-direction:column;gap:2px}
 .msg-hdr{display:flex;align-items:baseline;gap:6px}
 .msg-name{font-size:11px;font-weight:700}
-.cn-host{color:var(--gold)}
-.cn-mod{color:var(--blue)}
-.cn-user{color:var(--text2)}
+.cn-h{color:var(--gold)} .cn-m{color:var(--blue)} .cn-u{color:var(--text2)}
 .msg-time{font-size:9px;color:var(--text3)}
-.msg-txt{font-size:13px;line-height:1.55;word-break:break-word}
+.msg-txt{font-size:13px;line-height:1.55;word-break:break-word;color:var(--text)}
 .msg.sys .msg-txt{font-size:11px;color:var(--text3);font-style:italic}
 .muted-note{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:8px;font-size:11px;color:var(--red);text-align:center;margin:6px}
 .cinp-wrap{padding:10px;border-top:1px solid var(--brd);display:flex;gap:7px;flex-shrink:0}
@@ -163,19 +155,12 @@ video{width:100%;height:100%;object-fit:contain;display:block;pointer-events:non
 .csend:hover{background:#e5e5e5}
 .cinp:disabled,.csend:disabled{opacity:.3;cursor:not-allowed}
 
-/* MOBILE */
 @media(max-width:640px){
   .sidebar{position:fixed;bottom:0;left:0;right:0;width:100%;height:210px;border-left:none;border-top:1px solid var(--brd)}
   .vid-panel{padding-bottom:210px}
 }
-
-/* NOTIF */
-.notif{position:fixed;top:58px;left:50%;transform:translateX(-50%) translateY(-8px);background:rgba(20,20,20,.95);border:1px solid var(--brd);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;z-index:300;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;max-width:300px;overflow:hidden;text-overflow:ellipsis;backdrop-filter:blur(10px)}
+.notif{position:fixed;top:58px;left:50%;transform:translateX(-50%) translateY(-8px);background:rgba(15,15,15,.96);border:1px solid var(--brd);border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;z-index:300;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;max-width:300px;overflow:hidden;text-overflow:ellipsis;backdrop-filter:blur(10px);box-shadow:0 4px 20px rgba(0,0,0,.5)}
 .notif.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* SYNC BADGE */
-.sync-live{font-size:10px;font-weight:700;padding:4px 9px;border-radius:6px;background:rgba(34,197,94,.15);color:var(--grn);border:1px solid rgba(34,197,94,.25);letter-spacing:.5px}
-.sync-live.off{background:rgba(239,68,68,.1);color:var(--red);border-color:rgba(239,68,68,.25)}
 </style>
 </head>
 <body>
@@ -247,81 +232,47 @@ video{width:100%;height:100%;object-fit:contain;display:block;pointer-events:non
     <div class="tbar-cnt" id="tbar-cnt">0 izləyir</div>
     <button class="tbar-btn" id="leave-btn" onclick="leaveRoom()">Çıx</button>
   </div>
-
   <div class="room-body">
-    <!-- VIDEO -->
     <div class="vid-panel" id="vid-panel">
-      <video id="vid" preload="auto" playsinline></video>
-
-      <!-- Double tap indicators -->
-      <div class="dtap left" id="dtap-l">
-        <div class="dtap-circle">⏪</div>
-        <div class="dtap-lbl">-10 saniyə</div>
-      </div>
-      <div class="dtap right" id="dtap-r">
-        <div class="dtap-circle">⏩</div>
-        <div class="dtap-lbl">+10 saniyə</div>
-      </div>
-
-      <!-- Center play/pause -->
-      <div class="center-ico" id="center-ico">▶</div>
-
-      <div class="vid-overlay">
-        <div class="vctrl" id="vctrl">
-          <!-- Progress -->
-          <div class="prog-area" id="prog-area">
-            <div class="prog-track">
-              <div class="prog-buffered" id="prog-buf" style="width:0%"></div>
-              <div class="prog-fill" id="prog-fill" style="width:0%">
-                <div class="prog-thumb"></div>
-              </div>
+      <video id="vid" preload="auto" playsinline webkit-playsinline></video>
+      <div class="buf-spinner" id="buf-spin"></div>
+      <div class="center-ico" id="cico"></div>
+      <div class="dtap left" id="dtl"><div class="dtap-inner"><div class="dtap-circle">⏪</div><div class="dtap-lbl">-10s</div></div></div>
+      <div class="dtap right" id="dtr"><div class="dtap-inner"><div class="dtap-circle">⏩</div><div class="dtap-lbl">+10s</div></div></div>
+      <div class="vctrl" id="vctrl">
+        <div class="prog-wrap" id="pw">
+          <div class="prog-track">
+            <div class="prog-buf" id="pbuf" style="width:0%"></div>
+            <div class="prog-fill" id="pfill" style="width:0%">
+              <div class="prog-thumb"></div>
             </div>
           </div>
-          <!-- Controls row -->
-          <div class="ctrl-row">
-            <!-- Play -->
-            <button class="vbtn" id="play-btn" onclick="togglePlay()">
-              <svg id="play-ico" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-            </button>
-            <!-- -10s -->
-            <button class="vbtn" onclick="skipSec(-10)">
-              <svg viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6l8.5 6V6l-8.5 6z" opacity=".5"/><path d="M5 6v12l8-6z"/><text x="11" y="16" font-size="7" fill="currentColor" font-weight="bold">10</text></svg>
-            </button>
-            <!-- +10s -->
-            <button class="vbtn" onclick="skipSec(10)">
-              <svg viewBox="0 0 24 24"><path d="M13 18V6l8.5 6L13 18zm-.5-6L4 18V6l8.5 6z" opacity=".5"/><path d="M19 6v12l-8-6z"/><text x="4" y="16" font-size="7" fill="currentColor" font-weight="bold">10</text></svg>
-            </button>
-            <!-- Volume -->
-            <div class="vol-wrap">
-              <button class="vbtn" id="vol-btn" onclick="toggleMute()">
-                <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
-              </button>
-              <input type="range" class="vol-slider" id="vol-sl" min="0" max="1" step="0.05" value="1" oninput="setVol(this.value)">
-            </div>
-            <!-- Time -->
-            <div class="vtime" id="vtime">0:00 / 0:00</div>
-            <div class="spacer"></div>
-            <!-- Sync -->
-            <div class="sync-live" id="sync-badge">● CANLI</div>
-            <!-- Speed -->
-            <div class="speed-wrap">
-              <button class="vbtn speed-btn" id="speed-lbl" onclick="toggleSpeedMenu()">1×</button>
-              <div class="speed-menu" id="speed-menu">
-                <div class="speed-opt" onclick="setSpeed(0.25)">0.25×</div>
-                <div class="speed-opt" onclick="setSpeed(0.5)">0.5×</div>
-                <div class="speed-opt" onclick="setSpeed(0.75)">0.75×</div>
-                <div class="speed-opt active" onclick="setSpeed(1)">1×</div>
-                <div class="speed-opt" onclick="setSpeed(1.25)">1.25×</div>
-                <div class="speed-opt" onclick="setSpeed(1.5)">1.5×</div>
-                <div class="speed-opt" onclick="setSpeed(1.75)">1.75×</div>
-                <div class="speed-opt" onclick="setSpeed(2)">2×</div>
-              </div>
-            </div>
-            <!-- Fullscreen -->
-            <button class="vbtn" id="fs-btn" onclick="toggleFS()">
-              <svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
-            </button>
+        </div>
+        <div class="ctrl-row">
+          <button class="vbtn" id="pbtn" onclick="togglePlay()"><svg id="pico" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <button class="vbtn" onclick="skip(-10)" title="-10s"><svg viewBox="0 0 24 24"><path d="M11 18V6l-8.5 6 8.5 6zm.5-6 8.5 6V6l-8.5 6z"/></svg></button>
+          <button class="vbtn" onclick="skip(10)" title="+10s"><svg viewBox="0 0 24 24"><path d="M4 18l8.5-6L4 6v12zm9-12v12l8.5-6L13 6z"/></svg></button>
+          <div class="vol-group">
+            <button class="vbtn" id="vbtn" onclick="toggleMuteVol()"><svg id="vico" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>
+            <input type="range" class="vol-sl" id="vsl" min="0" max="1" step="0.05" value="1" oninput="setVol(this.value)">
           </div>
+          <div class="vtime" id="vt">0:00 / 0:00</div>
+          <div class="spacer"></div>
+          <div class="sync-badge" id="sbadge">● CANLI</div>
+          <div class="speed-wrap">
+            <button class="vbtn speed-btn" id="splbl" onclick="toggleSM()">1×</button>
+            <div class="speed-menu" id="smenu">
+              <div class="speed-opt" onclick="setSpd(0.25)">0.25×</div>
+              <div class="speed-opt" onclick="setSpd(0.5)">0.5×</div>
+              <div class="speed-opt" onclick="setSpd(0.75)">0.75×</div>
+              <div class="speed-opt on" onclick="setSpd(1)">1×</div>
+              <div class="speed-opt" onclick="setSpd(1.25)">1.25×</div>
+              <div class="speed-opt" onclick="setSpd(1.5)">1.5×</div>
+              <div class="speed-opt" onclick="setSpd(1.75)">1.75×</div>
+              <div class="speed-opt" onclick="setSpd(2)">2×</div>
+            </div>
+          </div>
+          <button class="vbtn" id="fsbtn" onclick="toggleFS()"><svg viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg></button>
         </div>
       </div>
     </div>
@@ -330,10 +281,10 @@ video{width:100%;height:100%;object-fit:contain;display:block;pointer-events:non
     <div class="sidebar">
       <div class="users-wrap">
         <div class="sec-lbl">Otaqda</div>
-        <div id="users-list"></div>
+        <div id="ulist"></div>
       </div>
       <div class="msgs" id="msgs"></div>
-      <div id="muted-note" class="muted-note" style="display:none">🔇 Siz susturuldunuz</div>
+      <div id="mnote" class="muted-note" style="display:none">🔇 Siz susturuldunuz</div>
       <div class="cinp-wrap">
         <input class="cinp" id="cinp" placeholder="Bir şey yazın..." maxlength="200" onkeydown="if(event.key==='Enter')sendMsg()">
         <button class="csend" id="csend" onclick="sendMsg()">↑</button>
@@ -355,226 +306,167 @@ firebase.initializeApp({
   messagingSenderId:"26858068381",
   appId:"1:26858068381:web:ca25def077d681ca23f774"
 });
-const db=firebase.database();
+const DB=firebase.database();
 
-// STATE
+// ── STATE ──
 let me={name:'',id:'',host:false,mod:false};
 let room={code:'',url:''};
 let rRef=null,uRef=null,cRef=null,vRef=null;
-let offs=[],isMuted=false,syncCd=false,vidReady=false;
-let ctrlTimer=null,isDragging=false,isMutedVol=false;
-let curSpeed=1;
+let offs=[],chatMuted=false,syncCd=false,vidReady=false;
+let isDrag=false,ctrlT=null,mutedVol=false,curSpd=1;
+let lastDBState=null; // last received DB state
 
 const vid=document.getElementById('vid');
-const vidPanel=document.getElementById('vid-panel');
-const progArea=document.getElementById('prog-area');
+const vp=document.getElementById('vid-panel');
+const pw=document.getElementById('pw');
 
 const $=id=>document.getElementById(id);
 function genCode(){const c='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';return Array.from({length:5},()=>c[Math.floor(Math.random()*c.length)]).join('');}
 function genId(){return Math.random().toString(36).slice(2,10);}
 function fmt(s){
   s=Math.floor(s||0);
-  const h=Math.floor(s/3600);
-  const m=Math.floor((s%3600)/60);
-  const sec=s%60;
-  if(h>0) return h+':'+(m<10?'0':'')+m+':'+(sec<10?'0':'')+sec;
-  return m+':'+(sec<10?'0':'')+sec;
+  const h=Math.floor(s/3600),m=Math.floor((s%3600)/60),sec=s%60;
+  const pad=n=>n<10?'0'+n:n;
+  return h>0?h+':'+pad(m)+':'+pad(sec):m+':'+pad(sec);
 }
 function esc(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function canManage(){return me.host||me.mod;}
+function canCtrl(){return me.host||me.mod;}
 
 // SCREENS
-function go(id){
-  document.querySelectorAll('.screen').forEach(s=>s.classList.add('off'));
-  if($(id))$(id).classList.remove('off');
-}
+function go(id){document.querySelectorAll('.screen').forEach(s=>s.classList.add('off'));if($(id))$(id).classList.remove('off');}
 
 // NOTIF
 let nT;
-function notif(msg,dur=2500){
-  const el=$('notif');el.textContent=msg;el.classList.add('show');
-  clearTimeout(nT);nT=setTimeout(()=>el.classList.remove('show'),dur);
-}
-function copyCode(){
-  navigator.clipboard.writeText(room.code).then(()=>notif('📋 '+room.code+' kopyalandı'));
-}
+function notif(msg,d=2500){const el=$('notif');el.textContent=msg;el.classList.add('show');clearTimeout(nT);nT=setTimeout(()=>el.classList.remove('show'),d);}
+function copyCode(){navigator.clipboard.writeText(room.code).then(()=>notif('📋 Kod kopyalandı: '+room.code));}
 
-// ── VIDEO CONTROLS VISIBILITY ──
-function showCtrl(permanent){
-  vidPanel.classList.add('ctrl-show');
-  clearTimeout(ctrlTimer);
-  if(!permanent) ctrlTimer=setTimeout(()=>{if(!isDragging)vidPanel.classList.remove('ctrl-show');},3000);
+// ── CONTROLS VISIBILITY ──
+function showCtrl(hold){
+  vp.classList.add('cs');
+  clearTimeout(ctrlT);
+  if(!hold)ctrlT=setTimeout(()=>{if(!isDrag)vp.classList.remove('cs');},3500);
 }
+vp.addEventListener('mousemove',()=>showCtrl(false));
+vp.addEventListener('mouseleave',()=>{if(!isDrag){clearTimeout(ctrlT);vp.classList.remove('cs');}});
 
-// DESKTOP: mousemove shows controls
-vidPanel.addEventListener('mousemove',()=>showCtrl(false));
-vidPanel.addEventListener('mouseleave',()=>{
-  if(!isDragging){clearTimeout(ctrlTimer);vidPanel.classList.remove('ctrl-show');}
-});
-
-// MOBILE TOUCH
-let lastTap=0,tapCount=0,tapX=0;
-vidPanel.addEventListener('touchend',e=>{
-  if(isDragging)return;
-  const now=Date.now();
-  const x=e.changedTouches[0].clientX;
-  const w=vidPanel.offsetWidth;
-  if(now-lastTap<280 && Math.abs(x-tapX)<80){
-    // Double tap
-    tapCount=0;
-    if(x<w*0.38){
-      doSkip(-10,'l');
-    } else if(x>w*0.62){
-      doSkip(10,'r');
-    } else {
-      togglePlay();
-    }
+// ── TOUCH ──
+let lastTap=0,tapX=0,tapTimer=null;
+vp.addEventListener('touchend',e=>{
+  if(isDrag)return;
+  const now=Date.now(),x=e.changedTouches[0].clientX,w=vp.offsetWidth;
+  if(now-lastTap<280&&Math.abs(x-tapX)<90){
+    clearTimeout(tapTimer);
+    if(x<w*.35){skipFlash(-10,'l');}
+    else if(x>w*.65){skipFlash(10,'r');}
+    else{togglePlay();}
   } else {
-    tapCount=1;
-    tapX=x;
-    setTimeout(()=>{
-      if(tapCount===1) showCtrl(false);
-      tapCount=0;
-    },280);
+    tapTimer=setTimeout(()=>showCtrl(false),10);
   }
-  lastTap=now;
+  lastTap=now;tapX=x;
 },{passive:true});
 
-function doSkip(s,side){
-  skipSec(s);
-  const el=$(side==='l'?'dtap-l':'dtap-r');
-  el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),700);
+function skipFlash(s,side){
+  skip(s);
+  const el=$(side==='l'?'dtl':'dtr');
+  el.classList.add('show');setTimeout(()=>el.classList.remove('show'),700);
 }
 
-// CENTER PLAY ICON FLASH
-function flashCenter(playing){
-  const el=$('center-ico');
+function flashCico(playing){
+  const el=$('cico');
   el.textContent=playing?'▶':'⏸';
-  el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'),600);
+  el.style.opacity='1';
+  setTimeout(()=>el.style.opacity='0',600);
 }
 
 // ── PROGRESS BAR ──
-function getPct(e){
-  const rect=progArea.getBoundingClientRect();
-  const x=(e.clientX??e.touches?.[0]?.clientX??0)-rect.left;
-  return Math.max(0,Math.min(1,x/rect.width));
+function getP(e){
+  const r=pw.getBoundingClientRect();
+  const x=(e.clientX??e.touches?.[0]?.clientX??0)-r.left;
+  return Math.max(0,Math.min(1,x/r.width));
 }
-function seekPct(pct){
-  const t=pct*(vid.duration||0);
-  if(canManage()){
-    vid.currentTime=t;
-    pushVid();
-  } else {
-    notif('Yalnız host/idarəçi idarə edə bilər');
-  }
+function doSeek(pct){
+  if(!canCtrl()){notif('Yalnız host/idarəçi idarə edə bilər');return;}
+  vid.currentTime=pct*(vid.duration||0);
+  pushVid();
 }
-
 // Mouse
-progArea.addEventListener('mousedown',e=>{
-  isDragging=true;progArea.classList.add('dragging');
-  seekPct(getPct(e));e.preventDefault();
-});
-document.addEventListener('mousemove',e=>{if(isDragging)seekPct(getPct(e));});
-document.addEventListener('mouseup',()=>{
-  if(isDragging){isDragging=false;progArea.classList.remove('dragging');}
-});
-
+pw.addEventListener('mousedown',e=>{isDrag=true;pw.classList.add('drag');doSeek(getP(e));e.preventDefault();});
+document.addEventListener('mousemove',e=>{if(isDrag)doSeek(getP(e));});
+document.addEventListener('mouseup',()=>{if(isDrag){isDrag=false;pw.classList.remove('drag');}});
 // Touch
-progArea.addEventListener('touchstart',e=>{
-  isDragging=true;progArea.classList.add('dragging');
-  seekPct(getPct(e));showCtrl(true);
-},{passive:true});
-document.addEventListener('touchmove',e=>{
-  if(isDragging){seekPct(getPct(e));e.preventDefault();}
-},{passive:false});
-document.addEventListener('touchend',()=>{
-  if(isDragging){isDragging=false;progArea.classList.remove('dragging');showCtrl(false);}
-});
+pw.addEventListener('touchstart',e=>{isDrag=true;pw.classList.add('drag');doSeek(getP(e));showCtrl(true);},{passive:true});
+document.addEventListener('touchmove',e=>{if(isDrag){doSeek(getP(e));e.preventDefault();}},{passive:false});
+document.addEventListener('touchend',()=>{if(isDrag){isDrag=false;pw.classList.remove('drag');showCtrl(false);}});
 
 // ── VOLUME ──
-function setVol(v){vid.volume=parseFloat(v);isMutedVol=(v==0);updateVolIcon();}
-function toggleMute(){
-  isMutedVol=!isMutedVol;
-  vid.volume=isMutedVol?0:parseFloat($('vol-sl').value)||1;
-  if(isMutedVol)$('vol-sl').value=0;
-  updateVolIcon();
+function setVol(v){vid.volume=parseFloat(v);mutedVol=v==0;updateVI();}
+function toggleMuteVol(){
+  mutedVol=!mutedVol;
+  vid.volume=mutedVol?0:parseFloat($('vsl').value)||1;
+  if(mutedVol)$('vsl').value=0;
+  updateVI();
 }
-function updateVolIcon(){
+function updateVI(){
   const v=vid.volume;
-  $('vol-btn').querySelector('svg').innerHTML=v===0
-    ?'<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>'
+  $('vico').innerHTML=v===0
+    ?'<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/>'
     :'<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
 }
 
 // ── SPEED ──
-function toggleSpeedMenu(){$('speed-menu').classList.toggle('open');}
-function setSpeed(s){
-  curSpeed=s;vid.playbackRate=s;
-  $('speed-lbl').textContent=s+'×';
-  document.querySelectorAll('.speed-opt').forEach(o=>o.classList.toggle('active',parseFloat(o.textContent)===s));
-  $('speed-menu').classList.remove('open');
+function toggleSM(){$('smenu').classList.toggle('open');}
+function setSpd(s){
+  curSpd=s;vid.playbackRate=s;
+  $('splbl').textContent=s+'×';
+  document.querySelectorAll('.speed-opt').forEach(o=>o.classList.toggle('on',parseFloat(o.textContent)===s));
+  $('smenu').classList.remove('open');
   notif('Sürət: '+s+'×');
 }
-document.addEventListener('click',e=>{
-  if(!e.target.closest('.speed-wrap'))$('speed-menu').classList.remove('open');
-});
+document.addEventListener('click',e=>{if(!e.target.closest('.speed-wrap'))$('smenu').classList.remove('open');});
 
 // ── FULLSCREEN ──
 function toggleFS(){
-  if(!document.fullscreenElement){
-    (vidPanel.requestFullscreen||vidPanel.webkitRequestFullscreen||vidPanel.mozRequestFullScreen).call(vidPanel);
-  } else {
-    (document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen).call(document);
-  }
+  if(!document.fullscreenElement){(vp.requestFullscreen||vp.webkitRequestFullscreen||vp.mozRequestFullScreen).call(vp);}
+  else{(document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen).call(document);}
 }
 document.addEventListener('fullscreenchange',()=>{
-  const fs=!!document.fullscreenElement;
-  $('fs-btn').querySelector('svg').innerHTML=fs
+  $('fsbtn').querySelector('svg').innerHTML=document.fullscreenElement
     ?'<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>'
     :'<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
 });
 
-// ── CREATE ──
+// ── CREATE / JOIN ──
 async function doCreate(){
-  const name=$('c-name').value.trim(),url=$('c-url').value.trim();
-  const err=$('c-err');
+  const name=$('c-name').value.trim(),url=$('c-url').value.trim(),err=$('c-err');
   if(!name){err.textContent='Adını daxil et';return;}
   if(!url){err.textContent='Video linkini daxil et';return;}
   err.textContent='Yaradılır...';
-  me={name,id:genId(),host:true,mod:false};
-  room={code:genCode(),url};
-  rRef=db.ref('rooms/'+room.code);
+  me={name,id:genId(),host:true,mod:false};room={code:genCode(),url};
+  rRef=DB.ref('rooms/'+room.code);
   await rRef.set({hostId:me.id,url,video:{playing:false,time:0,at:Date.now()},created:Date.now()});
   rRef.onDisconnect().remove();
-  $('show-code').textContent=room.code;
-  go('scr-wait');err.textContent='';
+  $('show-code').textContent=room.code;go('scr-wait');err.textContent='';
 }
-async function enterRoom(){await _joinData();startRoom();}
+async function enterRoom(){await _join();startRoom();}
 function cancelRoom(){if(rRef)rRef.remove();rRef=null;go('scr-home');}
 
-// ── JOIN ──
 async function doJoin(){
-  const name=$('j-name').value.trim(),code=$('j-code').value.trim().toUpperCase();
-  const err=$('j-err');
+  const name=$('j-name').value.trim(),code=$('j-code').value.trim().toUpperCase(),err=$('j-err');
   if(!name){err.textContent='Adını daxil et';return;}
   if(code.length!==5){err.textContent='5 simvollu kod daxil et';return;}
   err.textContent='Qoşulunur...';
-  const snap=await db.ref('rooms/'+code).get();
+  const snap=await DB.ref('rooms/'+code).get();
   if(!snap.exists()){err.textContent='❌ Otaq tapılmadı';return;}
-  me={name,id:genId(),host:false,mod:false};
-  room={code,url:snap.val().url};
-  rRef=db.ref('rooms/'+code);
-  await _joinData();
-  err.textContent='';startRoom();
+  me={name,id:genId(),host:false,mod:false};room={code,url:snap.val().url};
+  rRef=DB.ref('rooms/'+code);
+  await _join();err.textContent='';startRoom();
 }
-async function _joinData(){
-  uRef=db.ref('rooms/'+room.code+'/users/'+me.id);
+async function _join(){
+  uRef=DB.ref('rooms/'+room.code+'/users/'+me.id);
   await uRef.set({name:me.name,id:me.id,host:me.host,mod:me.mod,muted:false,joined:Date.now()});
   uRef.onDisconnect().remove();
-  vRef=db.ref('rooms/'+room.code+'/video');
-  cRef=db.ref('rooms/'+room.code+'/chat');
+  vRef=DB.ref('rooms/'+room.code+'/video');
+  cRef=DB.ref('rooms/'+room.code+'/chat');
 }
 
 // ── START ROOM ──
@@ -582,41 +474,57 @@ function startRoom(){
   $('tbar-code').textContent=room.code;
   if(me.host){$('leave-btn').textContent='Otağı bitir';$('leave-btn').classList.add('red');}
 
-  vid.src=room.url;vid.preload='auto';vid.load();
-  vid.playbackRate=curSpeed;
+  vid.src=room.url;vid.preload='auto';vid.load();vid.playbackRate=curSpd;
 
-  vid.addEventListener('loadedmetadata',()=>{vidReady=true;syncFromDB();});
+  // Buffering spinner
+  vid.addEventListener('waiting',()=>$('buf-spin').classList.add('show'));
+  vid.addEventListener('playing',()=>$('buf-spin').classList.remove('show'));
+  vid.addEventListener('canplay',()=>$('buf-spin').classList.remove('show'));
+
+  vid.addEventListener('loadedmetadata',()=>{vidReady=true;applyLastState();});
   vid.addEventListener('timeupdate',updTime);
-  vid.addEventListener('progress',updBuffer);
-  vid.addEventListener('play',()=>{if(!syncCd&&canManage())pushVid();updatePlayBtn(false);});
-  vid.addEventListener('pause',()=>{if(!syncCd&&canManage())pushVid();updatePlayBtn(true);});
+  vid.addEventListener('progress',updBuf);
 
-  // VIDEO SYNC — more frequent
-  const vl=vRef.on('value',snap=>{if(snap.exists())applyVid(snap.val());});
+  // Only host/mod push — don't push when applying sync
+  vid.addEventListener('play',()=>{if(!syncCd&&canCtrl()){pushVid();flashCico(true);}});
+  vid.addEventListener('pause',()=>{if(!syncCd&&canCtrl()){pushVid();flashCico(false);}});
+
+  // VIDEO SYNC from DB
+  const vl=vRef.on('value',snap=>{
+    if(!snap.exists())return;
+    lastDBState=snap.val();
+    if(vidReady)applyVid(lastDBState);
+  });
   offs.push(()=>vRef.off('value',vl));
 
+  // HOST HEARTBEAT — every 3s, update time so guests stay in sync
+  if(me.host){
+    const hb=setInterval(()=>{
+      if(!vRef||!vidReady)return;
+      vRef.update({time:vid.currentTime,at:Date.now()});
+    },3000);
+    offs.push(()=>clearInterval(hb));
+  }
+
   // USERS
-  const ul=db.ref('rooms/'+room.code+'/users').on('value',snap=>{
+  const ul=DB.ref('rooms/'+room.code+'/users').on('value',snap=>{
     const u=snap.val()||{};
     renderUsers(u);
     $('tbar-cnt').textContent=Object.keys(u).length+' izləyir';
-    const myData=u[me.id];
-    if(myData){
-      me.mod=!!myData.mod;
-      isMuted=!!myData.muted;
-      $('muted-note').style.display=isMuted?'block':'none';
-      $('cinp').disabled=isMuted;
-      $('csend').disabled=isMuted;
+    const my=u[me.id];
+    if(my){
+      me.mod=!!my.mod;
+      chatMuted=!!my.muted;
+      $('mnote').style.display=chatMuted?'block':'none';
+      $('cinp').disabled=chatMuted;
+      $('csend').disabled=chatMuted;
     }
   });
-  offs.push(()=>db.ref('rooms/'+room.code+'/users').off('value',ul));
+  offs.push(()=>DB.ref('rooms/'+room.code+'/users').off('value',ul));
 
   // ROOM DELETED
   const rl=rRef.on('value',snap=>{
-    if(!snap.exists()&&!me.host){
-      notif('🚫 Host otağı bitirdi',4000);
-      setTimeout(()=>{cleanup();go('scr-home');},1500);
-    }
+    if(!snap.exists()&&!me.host){notif('🚫 Host otağı bitirdi',4000);setTimeout(()=>{cleanup();go('scr-home');},1500);}
   });
   offs.push(()=>rRef.off('value',rl));
 
@@ -625,87 +533,73 @@ function startRoom(){
   offs.push(()=>cRef.off('child_added',cl));
   if(!me.host)cRef.push({sys:true,text:me.name+' otağa qoşuldu',ts:Date.now()});
 
-  // Host sync heartbeat — push every 5s to keep others in sync
-  if(me.host){
-    const hb=setInterval(()=>{
-      if(!vRef||vid.paused)return;
-      vRef.update({time:vid.currentTime,at:Date.now()});
-    },5000);
-    offs.push(()=>clearInterval(hb));
-  }
-
-  $('room').classList.add('on');
-  go('__none__');
+  $('room').classList.add('on');go('__none__');
 }
 
-// ── APPLY VIDEO STATE ──
+// ── VIDEO SYNC (no freeze) ──
+function applyLastState(){if(lastDBState)applyVid(lastDBState);}
+
 function applyVid(v){
   if(!vidReady)return;
-  const now=Date.now();
-  const elapsed=(now-v.at)/1000;
-  const target=v.time+(v.playing?elapsed:0);
+  const elapsed=(Date.now()-v.at)/1000;
+  const target=v.time+(v.playing?elapsed*curSpd:0);
+  const drift=Math.abs(vid.currentTime-target);
 
+  // Only seek if drift > 2s — avoids freeze from constant seeking
   syncCd=true;
-  // Sync if off by more than 1.5s
-  if(Math.abs(vid.currentTime-target)>1.5){
-    vid.currentTime=Math.max(0,Math.min(vid.duration||9999,target));
+  if(drift>2){
+    vid.currentTime=Math.max(0,Math.min(vid.duration||99999,target));
   }
   if(v.playing&&vid.paused){
     vid.play().catch(()=>{});
-    updatePlayBtn(false);
+    updatePBtn(false);
   } else if(!v.playing&&!vid.paused){
     vid.pause();
-    updatePlayBtn(true);
+    updatePBtn(true);
   }
 
   // Sync badge
-  const drift=Math.abs(vid.currentTime-target);
-  const sb=$('sync-badge');
-  sb.textContent=drift<2?'● CANLI':'● SİNX...';
-  sb.className='sync-live'+(drift>3?' off':'');
+  const sb=$('sbadge');
+  if(drift<1){sb.textContent='● CANLI';sb.className='sync-badge';}
+  else if(drift<3){sb.textContent='● ~'+drift.toFixed(0)+'s';sb.className='sync-badge warn';}
+  else{sb.textContent='● SİNX...';sb.className='sync-badge bad';}
 
-  setTimeout(()=>syncCd=false,500);
+  setTimeout(()=>syncCd=false,400);
 }
-function syncFromDB(){vRef.get().then(s=>{if(s.exists())applyVid(s.val());});}
+
 function pushVid(){
   if(!vRef)return;
   vRef.set({playing:!vid.paused,time:vid.currentTime,at:Date.now()});
 }
-
-// ── CONTROLS ──
 function togglePlay(){
-  if(!canManage()){notif('Yalnız host/idarəçi idarə edə bilər');return;}
-  if(vid.paused){vid.play().catch(()=>{});flashCenter(true);}
-  else{vid.pause();flashCenter(false);}
+  if(!canCtrl()){notif('Yalnız host/idarəçi idarə edə bilər');return;}
+  if(vid.paused)vid.play().catch(()=>{});else vid.pause();
 }
-function skipSec(s){
-  if(!canManage()){notif('Yalnız host/idarəçi idarə edə bilər');return;}
+function skip(s){
+  if(!canCtrl()){notif('Yalnız host/idarəçi idarə edə bilər');return;}
   vid.currentTime=Math.max(0,Math.min(vid.duration||0,vid.currentTime+s));
   pushVid();
 }
-function updatePlayBtn(paused){
-  $('play-ico').innerHTML=paused
-    ?'<path d="M8 5v14l11-7z"/>'
-    :'<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+function updatePBtn(paused){
+  $('pico').innerHTML=paused?'<path d="M8 5v14l11-7z"/>':'<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
 }
 function updTime(){
   const c=vid.currentTime,d=vid.duration||0;
-  $('vtime').textContent=fmt(c)+' / '+fmt(d);
-  if(!isDragging)$('prog-fill').style.width=(d?c/d*100:0)+'%';
+  $('vt').textContent=fmt(c)+' / '+fmt(d);
+  if(!isDrag)$('pfill').style.width=(d?c/d*100:0)+'%';
+  updatePBtn(vid.paused);
 }
-function updBuffer(){
-  if(!vid.buffered.length)return;
-  const d=vid.duration||1;
-  const b=vid.buffered.end(vid.buffered.length-1);
-  $('prog-buf').style.width=(b/d*100)+'%';
+function updBuf(){
+  if(!vid.buffered.length||!vid.duration)return;
+  $('pbuf').style.width=(vid.buffered.end(vid.buffered.length-1)/vid.duration*100)+'%';
 }
 
 // ── USERS ──
 function renderUsers(users){
-  $('users-list').innerHTML=Object.values(users).map(u=>{
+  $('ulist').innerHTML=Object.values(users).map(u=>{
     const isMe=u.id===me.id;
-    const canAct=canManage()&&!u.host&&!isMe;
-    let dotColor=u.host?'var(--gold)':u.mod?'var(--blue)':u.muted?'var(--red)':'var(--grn)';
+    const canAct=canCtrl()&&!u.host&&!isMe;
+    const dotC=u.host?'var(--gold)':u.mod?'var(--blue)':u.muted?'var(--red)':'var(--grn)';
     let badge='';
     if(u.host)badge='<span class="ubadge ub-host">HOST</span>';
     else if(u.mod)badge='<span class="ubadge ub-mod">MOD</span>';
@@ -713,71 +607,38 @@ function renderUsers(users){
     let acts='';
     if(canAct){
       acts+=u.muted
-        ?`<button class="uact a-unmute" onclick="unmuteUser('${u.id}','${esc(u.name)}')">🔊</button>`
-        :`<button class="uact a-mute" onclick="muteUser('${u.id}','${esc(u.name)}')">🔇</button>`;
-      acts+=`<button class="uact a-kick" onclick="kickUser('${u.id}','${esc(u.name)}')">✕</button>`;
-      if(me.host){
-        acts+=u.mod
-          ?`<button class="uact a-mod" onclick="removeMod('${u.id}','${esc(u.name)}')">⭐</button>`
-          :`<button class="uact a-mod" onclick="giveMod('${u.id}','${esc(u.name)}')">☆</button>`;
-      }
+        ?`<button class="uact ku" onclick="unmuteU('${u.id}','${esc(u.name)}')">🔊</button>`
+        :`<button class="uact km" onclick="muteU('${u.id}','${esc(u.name)}')">🔇</button>`;
+      acts+=`<button class="uact km" onclick="kickU('${u.id}','${esc(u.name)}')">✕</button>`;
+      if(me.host)acts+=u.mod
+        ?`<button class="uact kd" onclick="removeM('${u.id}','${esc(u.name)}')">⭐</button>`
+        :`<button class="uact kd" onclick="giveM('${u.id}','${esc(u.name)}')">☆</button>`;
     }
-    return `<div class="urow">
-      <div class="udot" style="background:${dotColor}"></div>
-      <div class="uname">${esc(u.name)}${isMe?' (sən)':''}</div>
-      ${badge}
-      <div class="uacts">${acts}</div>
-    </div>`;
+    return `<div class="urow"><div class="udot" style="background:${dotC}"></div><div class="uname">${esc(u.name)}${isMe?' (sən)':''}</div>${badge}<div class="uacts">${acts}</div></div>`;
   }).join('');
 }
 
-function kickUser(uid,un){
-  if(!canManage())return;
-  db.ref('rooms/'+room.code+'/users/'+uid).remove();
-  cRef.push({sys:true,text:un+' otaqdan çıxarıldı',ts:Date.now()});
-  notif('🚫 '+un+' çıxarıldı');
-}
-function muteUser(uid,un){
-  if(!canManage())return;
-  db.ref('rooms/'+room.code+'/users/'+uid+'/muted').set(true);
-  cRef.push({sys:true,text:un+' susturuldu 🔇',ts:Date.now()});
-  notif('🔇 '+un+' susturuldu');
-}
-function unmuteUser(uid,un){
-  if(!canManage())return;
-  db.ref('rooms/'+room.code+'/users/'+uid+'/muted').set(false);
-  cRef.push({sys:true,text:un+' susturmadan çıxarıldı 🔊',ts:Date.now()});
-  notif('🔊 '+un+' açıldı');
-}
-function giveMod(uid,un){
-  if(!me.host)return;
-  db.ref('rooms/'+room.code+'/users/'+uid+'/mod').set(true);
-  cRef.push({sys:true,text:un+' idarəçi oldu 🌟',ts:Date.now()});
-  notif('⭐ '+un+' idarəçi edildi');
-}
-function removeMod(uid,un){
-  if(!me.host)return;
-  db.ref('rooms/'+room.code+'/users/'+uid+'/mod').set(false);
-  cRef.push({sys:true,text:un+' idarəçilikdən çıxarıldı',ts:Date.now()});
-  notif('❌ '+un+' mod deyil');
-}
+function kickU(uid,un){if(!canCtrl())return;DB.ref('rooms/'+room.code+'/users/'+uid).remove();cRef.push({sys:true,text:un+' çıxarıldı',ts:Date.now()});notif('🚫 '+un+' çıxarıldı');}
+function muteU(uid,un){if(!canCtrl())return;DB.ref('rooms/'+room.code+'/users/'+uid+'/muted').set(true);cRef.push({sys:true,text:un+' susturuldu 🔇',ts:Date.now()});notif('🔇 '+un);}
+function unmuteU(uid,un){if(!canCtrl())return;DB.ref('rooms/'+room.code+'/users/'+uid+'/muted').set(false);cRef.push({sys:true,text:un+' susturmadan çıxarıldı 🔊',ts:Date.now()});notif('🔊 '+un);}
+function giveM(uid,un){if(!me.host)return;DB.ref('rooms/'+room.code+'/users/'+uid+'/mod').set(true);cRef.push({sys:true,text:un+' idarəçi oldu 🌟',ts:Date.now()});notif('⭐ '+un+' idarəçi edildi');}
+function removeM(uid,un){if(!me.host)return;DB.ref('rooms/'+room.code+'/users/'+uid+'/mod').set(false);cRef.push({sys:true,text:un+' idarəçilikdən çıxarıldı',ts:Date.now()});notif('❌ '+un+' mod deyil');}
 
 // ── CHAT ──
 function sendMsg(){
-  if(isMuted)return;
+  if(chatMuted)return;
   const inp=$('cinp'),txt=inp.value.trim();if(!txt)return;
   cRef.push({name:me.name,id:me.id,host:me.host,mod:me.mod,text:txt,ts:Date.now()});
   inp.value='';
 }
 function appendMsg(m){
-  const box=$('msgs');
-  const d=document.createElement('div');
+  const box=$('msgs'),d=document.createElement('div');
   const time=new Date(m.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   if(m.sys){
     d.className='msg sys';
     d.innerHTML=`<div class="msg-txt">— ${esc(m.text)}</div>`;
   } else {
-    const nc=m.host?'cn-host':m.mod?'cn-mod':'cn-user';
+    const nc=m.host?'cn-h':m.mod?'cn-m':'cn-u';
     const badge=m.host?' 👑':m.mod?' 🌟':'';
     d.className='msg';
     d.innerHTML=`<div class="msg-hdr"><span class="msg-name ${nc}">${esc(m.name)}${badge}</span><span class="msg-time">${time}</span></div><div class="msg-txt">${esc(m.text)}</div>`;
@@ -788,35 +649,25 @@ function appendMsg(m){
 
 // ── LEAVE ──
 function leaveRoom(){
-  if(me.host){
-    if(!confirm('Otağı hamı üçün bitirmək istəyirsən?'))return;
-    rRef.remove();
-  } else {
-    if(cRef)cRef.push({sys:true,text:me.name+' otaqdan ayrıldı',ts:Date.now()});
-    if(uRef)uRef.remove();
-  }
+  if(me.host){if(!confirm('Otağı hamı üçün bitirmək istəyirsən?'))return;rRef.remove();}
+  else{if(cRef)cRef.push({sys:true,text:me.name+' otaqdan ayrıldı',ts:Date.now()});if(uRef)uRef.remove();}
   cleanup();go('scr-home');
 }
 function cleanup(){
   offs.forEach(f=>f());offs=[];
-  vid.src='';vidReady=false;isMuted=false;
+  vid.src='';vidReady=false;chatMuted=false;lastDBState=null;
   rRef=uRef=cRef=vRef=null;
   me={name:'',id:'',host:false,mod:false};room={code:'',url:''};
-  $('msgs').innerHTML='';$('users-list').innerHTML='';
-  $('room').classList.remove('on');
-  $('leave-btn').textContent='Çıx';
-  $('leave-btn').classList.remove('red');
-  vidPanel.classList.remove('ctrl-show');
+  $('msgs').innerHTML='';$('ulist').innerHTML='';
+  $('room').classList.remove('on');vp.classList.remove('cs');
+  $('leave-btn').textContent='Çıx';$('leave-btn').classList.remove('red');
 }
 
 // Kick detection
 setInterval(()=>{
   if(!room.code||!me.id||me.host)return;
-  db.ref('rooms/'+room.code+'/users/'+me.id).get().then(s=>{
-    if(room.code&&!s.exists()){
-      notif('🚫 Siz otaqdan çıxarıldınız',4000);
-      setTimeout(()=>{cleanup();go('scr-home');},1500);
-    }
+  DB.ref('rooms/'+room.code+'/users/'+me.id).get().then(s=>{
+    if(room.code&&!s.exists()){notif('🚫 Siz otaqdan çıxarıldınız',4000);setTimeout(()=>{cleanup();go('scr-home');},1500);}
   });
 },3000);
 </script>
