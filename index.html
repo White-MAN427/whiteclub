@@ -482,6 +482,8 @@ function startRoom(){
   vid.addEventListener('canplay',()=>$('buf-spin').classList.remove('show'));
 
   vid.addEventListener('loadedmetadata',()=>{vidReady=true;applyLastState();});
+  vid.addEventListener('canplay',()=>{applyLastState();});
+  vid.addEventListener('canplaythrough',()=>{applyLastState();});
   vid.addEventListener('timeupdate',updTime);
   vid.addEventListener('progress',updBuf);
 
@@ -493,7 +495,12 @@ function startRoom(){
   const vl=vRef.on('value',snap=>{
     if(!snap.exists())return;
     lastDBState=snap.val();
+    // Always try — applyVid handles not-ready case gracefully
     if(vidReady)applyVid(lastDBState);
+    else{
+      // Try again after short delay — video may not be ready yet
+      setTimeout(()=>{if(lastDBState){vidReady=true;applyVid(lastDBState);}},1500);
+    }
   });
   offs.push(()=>vRef.off('value',vl));
 
@@ -537,7 +544,12 @@ function startRoom(){
 }
 
 // ── VIDEO SYNC (no freeze) ──
-function applyLastState(){if(lastDBState)applyVid(lastDBState);}
+function applyLastState(){
+  if(!lastDBState)return;
+  // Force apply even if vidReady not set yet
+  vidReady=true;
+  applyVid(lastDBState);
+}
 
 function applyVid(v){
   if(!vidReady)return;
