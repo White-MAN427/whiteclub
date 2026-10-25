@@ -80,9 +80,17 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .room-body{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
 
 /* VIDEO */
-.vid-wrap{flex-shrink:0;background:#000;position:relative;width:100%}
-.vid-wrap video{width:100%;max-height:45vh;object-fit:contain;display:block}
-@media(min-width:768px){.vid-wrap video{max-height:55vh}}
+.vid-wrap{flex-shrink:0;background:#000;position:relative;width:100%;display:flex;justify-content:center}
+.vid-wrap video{width:100%;max-width:860px;max-height:48vh;object-fit:contain;display:block}
+@media(min-width:768px){.vid-wrap video{max-height:58vh}}
+/* Fullscreen: video tam ekran olur */
+.vid-wrap:-webkit-full-screen{max-width:none}
+.vid-wrap:-webkit-full-screen video{max-width:100%;max-height:100vh}
+.vid-wrap:fullscreen{max-width:none}
+.vid-wrap:fullscreen video{max-width:100%;max-height:100vh}
+/* Controls da fullscreendə görünsün */
+.vid-wrap:-webkit-full-screen .vctrl{opacity:1;pointer-events:all}
+.vid-wrap:fullscreen .vctrl{opacity:1;pointer-events:all}
 
 /* BUFFERING */
 .buf-spin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border:3px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none}
@@ -97,8 +105,12 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .dtap-lbl{font-size:13px;font-weight:700;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.8);background:rgba(0,0,0,.5);padding:6px 12px;border-radius:20px}
 
 /* VIDEO CONTROLS */
-.vctrl{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.85));padding:0 12px 10px;opacity:0;transition:opacity .3s;pointer-events:none}
+.vctrl{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.85));padding:0 12px 10px;opacity:0;transition:opacity .3s;pointer-events:none;max-width:860px;margin:0 auto}
 .vid-wrap.cs .vctrl{opacity:1;pointer-events:all}
+/* dtap da mərkəzdə olsun */
+.dtap{position:absolute;top:0;bottom:56px;width:30%;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .2s}
+.dtap.left{left:calc(50% - 430px);left:max(0px, calc(50% - 430px))}
+.dtap.right{right:calc(50% - 430px);right:max(0px, calc(50% - 430px))}
 .prog-wrap{padding:10px 0 6px;cursor:pointer;touch-action:none}
 .prog-track{height:3px;background:rgba(255,255,255,.2);border-radius:3px;position:relative;transition:height .15s}
 .prog-wrap:hover .prog-track,.prog-wrap.drag .prog-track{height:5px}
@@ -466,14 +478,25 @@ document.addEventListener('click',e=>{if(!e.target.closest('.speed-wrap'))$('sme
 
 // FULLSCREEN
 function toggleFS(){
-  if(!document.fullscreenElement){(vw.requestFullscreen||vw.webkitRequestFullscreen||vw.mozRequestFullScreen).call(vw);}
-  else{(document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen).call(document);}
+  // iOS Safari: video elementinin öz fullscreen metodu
+  if(vid.webkitEnterFullscreen&&!document.fullscreenElement&&!document.webkitFullscreenElement){
+    vid.webkitEnterFullscreen();return;
+  }
+  const el=vw;
+  if(!document.fullscreenElement&&!document.webkitFullscreenElement){
+    (el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen||el.msRequestFullscreen||function(){vid.webkitEnterFullscreen();}).call(el);
+  } else {
+    (document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen||document.msExitFullscreen).call(document);
+  }
 }
-document.addEventListener('fullscreenchange',()=>{
-  $('fsbtn').querySelector('svg').innerHTML=document.fullscreenElement
+function onFSChange(){
+  const isFS=!!(document.fullscreenElement||document.webkitFullscreenElement);
+  $('fsbtn').querySelector('svg').innerHTML=isFS
     ?'<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>'
     :'<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
-});
+}
+document.addEventListener('fullscreenchange',onFSChange);
+document.addEventListener('webkitfullscreenchange',onFSChange);
 
 // CREATE / JOIN
 async function doCreate(){
