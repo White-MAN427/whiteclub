@@ -35,7 +35,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .btn-acc:hover{background:var(--acc2)}
 .btn-g{background:transparent;border:1px solid var(--brd);color:var(--text2)}
 .btn-g:hover{border-color:#555;color:var(--text)}
-.err{font-size:12px;color:var(--red);text-align:center;min-height:16px;margin-bottom:6px}
+.err{font-size:12px;color:var(--red);text-align:center;min-height:16px;margin-bottom:6px;white-space:pre-line;line-height:1.5}
+.err.info{color:var(--text2)}
+.hint{font-size:11px;color:var(--text3);line-height:1.5;margin:-2px 2px 10px}
 .choice-wrap{display:flex;flex-direction:column;gap:12px;width:100%;max-width:340px}
 .choice{padding:20px 22px;border:1px solid var(--brd);border-radius:18px;background:var(--bg2);cursor:pointer;transition:all .2s;text-align:left}
 .choice:hover{border-color:var(--acc2);background:var(--bg3)}
@@ -206,8 +208,9 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
     <div class="card-s">İzləmə otağını qur</div>
     <input class="inp" id="c-name" placeholder="Adın" maxlength="20">
     <input class="inp" id="c-url" placeholder="Video linki (MP4)" autocomplete="off">
+    <div class="hint">Birbaşa video faylı (.mp4) linki lazımdır. archive.org, Dropbox, Cloudflare R2, Backblaze B2 və UploadNow birbaşa linkləri işləyir. archive.org və Dropbox səhifə linkini özü çevirir.</div>
     <div class="err" id="c-err"></div>
-    <button class="btn btn-acc" onclick="doCreate()">Otaq yarat →</button>
+    <button class="btn btn-acc" id="c-btn" onclick="doCreate()">Otaq yarat →</button>
     <button class="btn btn-g" onclick="go('scr-home')">← Geri</button>
   </div>
 </div>
@@ -470,16 +473,104 @@ function setSpd(s){curSpd=s;vid.playbackRate=s;$('splbl').textContent=s+'×';doc
 document.addEventListener('click',e=>{if(!e.target.closest('.speed-wrap'))$('smenu').classList.remove('open');});
 
 // CREATE / JOIN
+// ── LİNK ANALİZİ ──
+async function resolveVideoUrl(raw){
+  let u=raw.trim();
+  if(!/^https?:\/\//i.test(u))u='https://'+u;
+  u=u.replace(/^http:\/\//i,'https://'); // HTTPS səhifədə http video bloklanır
+  let p;
+  try{p=new URL(u);}catch(e){return{error:'Link düzgün formatda deyil'};}
+  const h=p.hostname.toLowerCase();
+
+  // UploadNow paylaşma səhifəsi (/s/...) video faylı deyil
+  if((h==='uploadnow.io'||h.endsWith('.uploadnow.io'))&&/^\/s\//.test(p.pathname)){
+    return{error:'Bu UploadNow səhifə linkidir, video faylı deyil.\nFaylın "Yüklə" düyməsinə sağ klik → "Link ünvanını kopyala" ilə birbaşa linki götür və onu yapışdır.'};
+  }
+
+  // Dropbox paylaşma linki → birbaşa fayl (raw=1)
+  if(h==='dropbox.com'||h==='www.dropbox.com'){
+    p.searchParams.delete('dl');
+    p.searchParams.set('raw','1');
+    return{url:p.href};
+  }
+
+  // Google Drive paylaşma linki → yükləmə linki (böyük fayllarda işləməyə bilər)
+  if(h==='drive.google.com'){
+    const m=p.pathname.match(/\/file\/d\/([^\/]+)/);
+    const id=m?m[1]:p.searchParams.get('id');
+    if(id)return{url:'https://drive.google.com/uc?export=download&id='+encodeURIComponent(id)};
+  }
+
+  // archive.org səhifəsi → MP4 faylı avtomatik tapılır
+  if(h==='archive.org'||h==='www.archive.org'){
+    const m=p.pathname.match(/^\/details\/([^\/]+)/);
+    if(m){
+      const id=decodeURIComponent(m[1]);
+      try{
+        const r=await fetch('https://archive.org/metadata/'+encodeURIComponent(id));
+        const j=await r.json();
+        const files=(j.files||[]).filter(f=>/\.(mp4|m4v|webm)$/i.test(f.name));
+        if(!files.length)return{error:'Bu archive.org səhifəsində MP4 fayl tapılmadı. Birbaşa fayl linkini yapışdır.'};
+        const f=files.find(x=>x.format==='h.264'||x.format==='MPEG4')||files[0];
+        return{url:'https://archive.org/download/'+encodeURIComponent(id)+'/'+f.name.split('/').map(encodeURIComponent).join('/')};
+      }catch(e){
+        return{error:'archive.org səhifəsi oxunmadı. Birbaşa fayl linkini yapışdır.'};
+      }
+    }
+  }
+  return{url:p.href};
+}
+
+// Link açılmayanda host-a uyğun konkret ipucu
+function hostHint(url){
+  let h='';try{h=new URL(url).hostname.toLowerCase();}catch(e){}
+  if(h.includes('drive.google.com')||h.includes('googleusercontent.com'))
+    return'\nGoogle Drive böyük fayllarda (təxminən 100 MB-dan çox) virus yoxlama səhifəsi və gündəlik limit səbəbindən işləmir.';
+  if(h.includes('dropbox'))
+    return'\nDropbox-da link "linki olan hər kəs" üçün açıq olmalıdır. Pulsuz hesabda yer 2 GB-dır.';
+  if(h.includes('uploadnow.io'))
+    return'\nUploadNow-da "Yüklə" düyməsinə sağ klik → "Link ünvanını kopyala" ilə birbaşa linki götür.';
+  if(h.includes('r2.dev'))
+    return'\nCloudflare R2-də bucket-in "Public Development URL" ayarı aktiv olmalıdır.';
+  return'';
+}
+
+// Linkin həqiqətən video kimi açıldığını yoxlayır
+function testVideoUrl(url,ms=15000){
+  return new Promise(resolve=>{
+    const v=document.createElement('video');
+    v.preload='metadata';v.muted=true;
+    let done=false,tm=null;
+    const fin=r=>{if(done)return;done=true;clearTimeout(tm);v.removeAttribute('src');v.load();resolve(r);};
+    tm=setTimeout(()=>fin({ok:true,slow:true}),ms); // yavaş serverdə bloklama
+    v.addEventListener('loadedmetadata',()=>fin({ok:true}));
+    v.addEventListener('error',()=>fin({ok:false,error:'Bu link video kimi açılmadı.\nBirbaşa video faylı (.mp4) linki olmalıdır. Səhifə linki, bloklanmış link və ya brauzerin dəstəkləmədiyi format işləməz.'}));
+    v.src=url;
+  });
+}
+
+function setErr(msg,info){const e=$('c-err');e.textContent=msg;e.classList.toggle('info',!!info);}
+
 async function doCreate(){
-  const name=$('c-name').value.trim(),url=$('c-url').value.trim(),err=$('c-err');
-  if(!name){err.textContent='Adını daxil et';return;}
-  if(!url){err.textContent='Video linkini daxil et';return;}
-  err.textContent='Yaradılır...';
-  me={name,id:genId(),host:true,mod:false};room={code:genCode(),url};
-  rRef=DB.ref('rooms/'+room.code);
-  await rRef.set({hostId:me.id,url,video:{playing:false,time:0,at:nowS(),by:'',seeked:false},created:Date.now()});
-  rRef.onDisconnect().remove();
-  $('show-code').textContent=room.code;go('scr-wait');err.textContent='';
+  const name=$('c-name').value.trim(),raw=$('c-url').value.trim();
+  if(!name){setErr('Adını daxil et');return;}
+  if(!raw){setErr('Video linkini daxil et');return;}
+  const btn=$('c-btn');btn.disabled=true;
+  try{
+    setErr('Link yoxlanılır...',true);
+    const r=await resolveVideoUrl(raw);
+    if(r.error){setErr(r.error);return;}
+    const t=await testVideoUrl(r.url);
+    if(!t.ok){setErr(t.error+hostHint(r.url));return;}
+    setErr('Yaradılır...',true);
+    me={name,id:genId(),host:true,mod:false};room={code:genCode(),url:r.url};
+    rRef=DB.ref('rooms/'+room.code);
+    await rRef.set({hostId:me.id,url:r.url,video:{playing:false,time:0,at:nowS(),by:'',seeked:false},created:Date.now()});
+    rRef.onDisconnect().remove();
+    $('show-code').textContent=room.code;go('scr-wait');setErr('');
+  }catch(e){
+    setErr('Xəta baş verdi. İnterneti yoxla və yenidən cəhd et.');
+  }finally{btn.disabled=false;}
 }
 async function enterRoom(){await _join();startRoom();}
 function cancelRoom(){if(rRef)rRef.remove();rRef=null;go('scr-home');}
@@ -555,6 +646,11 @@ function startRoom(){
 
 function bindVideoEvents(){
   if(vidBound)return;vidBound=true;
+  vid.addEventListener('error',()=>{
+    if(!room.code)return;
+    $('bspin').classList.remove('show');
+    toast('⚠️ Video yüklənmədi. Link bloklanıb və ya format dəstəklənmir',7000);
+  });
   vid.addEventListener('waiting',()=>{
     $('bspin').classList.add('show');
     if(uRef)uRef.child('buffering').set(true);
