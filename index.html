@@ -2,7 +2,7 @@
 <html lang="az">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover,interactive-widget=resizes-content">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>WhiteClub</title>
@@ -26,7 +26,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .card{background:var(--bg2);border:1px solid var(--brd);border-radius:20px;padding:28px;width:100%;max-width:360px}
 .card-t{font-size:19px;font-weight:800;margin-bottom:4px}
 .card-s{font-size:12px;color:var(--text2);margin-bottom:22px}
-.inp{width:100%;padding:13px 16px;border:1px solid var(--brd);border-radius:12px;background:var(--bg3);color:var(--text);font-size:15px;outline:none;margin-bottom:10px;transition:border-color .2s}
+.inp{width:100%;padding:13px 16px;border:1px solid var(--brd);border-radius:12px;background:var(--bg3);color:var(--text);font-size:16px;outline:none;margin-bottom:10px;transition:border-color .2s}
 .inp:focus{border-color:var(--acc2)}
 .inp::placeholder{color:var(--text3)}
 .btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;margin-bottom:8px;transition:all .15s}
@@ -49,132 +49,137 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .code-box:hover{background:var(--bg4)}
 .code-hint{font-size:11px;color:var(--text3);text-align:center;margin-top:-8px;margin-bottom:14px}
 
-/* ROOM */
-#room{position:fixed;inset:0;z-index:40;display:flex;flex-direction:column;opacity:0;pointer-events:none;transition:opacity .25s;background:var(--bg);overflow:hidden}
+/* ROOM — mərkəzdə dar sütun (HerrWParty tərzi) */
+#room{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;opacity:0;pointer-events:none;transition:opacity .25s}
 #room.on{opacity:1;pointer-events:all}
+#room.fake-fs{overflow:hidden}
+.stage{width:100%;max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;gap:12px;padding:10px 12px calc(14px + env(safe-area-inset-bottom))}
+.room-title{font-size:20px;font-weight:900;color:var(--gold);text-align:center;letter-spacing:-.5px;padding:6px 0 10px;border-bottom:1px solid var(--brd);flex-shrink:0}
+.rcard{background:var(--bg2);border:1px solid var(--brd);border-radius:14px}
 
-/* HEADER */
-.room-head{flex-shrink:0;background:var(--bg2);border-bottom:1px solid var(--brd);padding:10px 16px;display:flex;flex-direction:column;gap:8px}
-.room-title{font-size:17px;font-weight:900;color:var(--gold);text-align:center;letter-spacing:-.5px}
-.room-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
-.room-code-wrap{display:flex;align-items:center;gap:6px}
+/* Otaq kartı */
+.room-card{padding:12px 14px;display:flex;flex-direction:column;gap:10px;flex-shrink:0}
+.rc-row{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.rc-code{display:flex;align-items:center;gap:8px;min-width:0}
 .dot-live{width:8px;height:8px;border-radius:50%;background:var(--red);animation:pulse 1.5s infinite;flex-shrink:0}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
 .room-code-lbl{font-size:10px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:1px}
-.room-code-val{font-size:14px;font-weight:900;letter-spacing:4px;color:var(--gold)}
-.head-btns{display:flex;gap:6px;margin-left:auto}
-.hbtn{padding:6px 12px;border:1px solid var(--brd);border-radius:8px;background:none;color:var(--text2);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px}
-.hbtn:hover{border-color:#555;color:var(--text)}
+.room-code-val{font-size:18px;font-weight:900;letter-spacing:4px;color:var(--gold);line-height:1.15}
+.rc-btns{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.hbtn{padding:6px 12px;border:1px solid rgba(245,158,11,.45);border-radius:8px;background:none;color:var(--gold);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:4px;white-space:nowrap}
+.hbtn:hover{background:rgba(245,158,11,.1)}
 .hbtn:active{transform:scale(.96)}
-.hbtn.red{border-color:var(--red);color:var(--red)}
+.sync-b{font-size:9px;font-weight:700;padding:4px 8px;border-radius:6px;background:rgba(34,197,94,.15);color:var(--grn);border:1px solid rgba(34,197,94,.25);white-space:nowrap;letter-spacing:.4px}
+.sync-b.warn{background:rgba(245,158,11,.15);color:var(--gold);border-color:rgba(245,158,11,.3)}
+.sync-b.bad{background:rgba(239,68,68,.15);color:var(--red);border-color:rgba(239,68,68,.3)}
 .user-chips{display:flex;gap:6px;flex-wrap:wrap}
-.uchip{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border-radius:20px;background:var(--bg3);border:1px solid var(--brd);font-size:12px;font-weight:600}
+.uchip{display:inline-flex;align-items:center;gap:6px;padding:4px 10px 4px 4px;border-radius:20px;background:var(--bg3);border:1px solid var(--brd);font-size:12px;font-weight:600}
 .uchip.is-host{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.08)}
 .uchip.is-mod{border-color:rgba(59,130,246,.4);background:rgba(59,130,246,.08)}
-.uavatar{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;flex-shrink:0;color:#fff}
+.uavatar{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;color:#fff}
 .ubadge-sm{font-size:8px;padding:1px 5px;border-radius:4px;font-weight:700;text-transform:uppercase}
 .ub-host{background:rgba(245,158,11,.2);color:var(--gold)}
 .ub-mod{background:rgba(59,130,246,.2);color:var(--blue)}
-.uact-sm{background:none;border:none;cursor:pointer;font-size:12px;padding:0 2px;color:var(--text3);line-height:1}
+.uact-sm{background:none;border:none;cursor:pointer;font-size:13px;padding:2px 3px;color:var(--text3);line-height:1}
 .uact-sm:hover{color:var(--red)}
 
-/* ROOM BODY */
-.room-body{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+/* Video kartı — həmişə 16:9, bütün eni doldurmur */
+.vid-card{position:relative;width:100%;aspect-ratio:16/9;background:#000;border:1px solid var(--brd);border-radius:14px;overflow:hidden;flex-shrink:0;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+.vid-card video{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;background:#000;display:block}
 
-/* VIDEO */
-.vid-wrap{flex-shrink:0;background:#000;position:relative;width:100%;display:flex;justify-content:center;align-items:center}
-.vid-wrap video{width:100%;max-width:860px;max-height:42vh;object-fit:contain;display:block}
-@media(min-width:768px){.vid-wrap video{max-height:56vh}}
+/* Tam ekran (CSS ilə — bütün telefonlarda işləyir) */
+#room.fake-fs .vid-card{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;aspect-ratio:auto;border:0;border-radius:0;z-index:1000}
+#room.fake-fs .vctrl{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right));padding-bottom:calc(12px + env(safe-area-inset-bottom))}
 
-/* FAKE FULLSCREEN (mobil üçün) */
-#room.fake-fs{z-index:999}
-#room.fake-fs .room-head{display:none}
-#room.fake-fs .vid-wrap{position:fixed;inset:0;z-index:1000;background:#000;max-height:none;justify-content:center;align-items:center}
-#room.fake-fs .vid-wrap video{max-height:100vh;max-height:100dvh;max-width:100vw;width:100vw;height:100vh;height:100dvh}
-#room.fake-fs .vid-wrap{height:100vh;height:100dvh}
-#room.fake-fs .chat-area{display:none}
-
-/* BUFFERING */
 .buf-spin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border:3px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;z-index:5}
 .buf-spin.show{display:block}
 @keyframes spin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 
-/* DOUBLE TAP */
-.dtap{position:absolute;top:0;bottom:56px;width:32%;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .2s;z-index:3}
+.dtap{position:absolute;top:0;bottom:48px;width:32%;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .2s;z-index:3}
 .dtap.left{left:0;background:radial-gradient(ellipse at 20%,rgba(255,255,255,.1),transparent 70%)}
 .dtap.right{right:0;background:radial-gradient(ellipse at 80%,rgba(255,255,255,.1),transparent 70%)}
 .dtap.show{opacity:1}
 .dtap-lbl{font-size:12px;font-weight:700;color:#fff;background:rgba(0,0,0,.5);padding:5px 12px;border-radius:16px}
 
-/* VIDEO CONTROLS */
-.vctrl{position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,.88));padding:0 12px 10px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:4}
-.vid-wrap.cs .vctrl{opacity:1;pointer-events:all}
-.prog-wrap{padding:10px 0 6px;cursor:pointer;touch-action:none;position:relative}
-.prog-track{height:3px;background:rgba(255,255,255,.2);border-radius:3px;position:relative;transition:height .15s}
+/* Kontrollar */
+.vctrl{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(transparent,rgba(0,0,0,.88));padding:20px 8px 6px;opacity:0;transition:opacity .25s;pointer-events:none;z-index:4}
+.vid-card.cs .vctrl{opacity:1;pointer-events:all}
+.prog-wrap{padding:9px 4px 5px;cursor:pointer;touch-action:none}
+.prog-track{height:3px;background:rgba(255,255,255,.22);border-radius:3px;position:relative;transition:height .15s}
 .prog-wrap:hover .prog-track,.prog-wrap.drag .prog-track{height:5px}
 .prog-buf{position:absolute;top:0;left:0;height:100%;background:rgba(255,255,255,.3);border-radius:3px;pointer-events:none}
 .prog-fill{position:absolute;top:0;left:0;height:100%;background:var(--gold);border-radius:3px;pointer-events:none}
 .prog-thumb{position:absolute;top:50%;right:-6px;transform:translateY(-50%);width:13px;height:13px;border-radius:50%;background:var(--gold);opacity:0;transition:opacity .15s;pointer-events:none}
 .prog-wrap:hover .prog-thumb,.prog-wrap.drag .prog-thumb{opacity:1}
-.ctrl-row{display:flex;align-items:center;gap:1px}
-.vbtn{background:none;border:none;color:#fff;cursor:pointer;padding:6px;border-radius:8px;transition:background .15s;display:flex;align-items:center;justify-content:center;min-width:36px;min-height:40px}
-.vbtn:hover{background:rgba(255,255,255,.1)}
-.vbtn:active{background:rgba(255,255,255,.2);transform:scale(.92)}
-.vbtn svg{width:20px;height:20px;fill:currentColor}
-.vtime{font-size:11px;color:rgba(255,255,255,.85);font-weight:600;white-space:nowrap;margin:0 3px}
-.spacer{flex:1}
+.ctrl-row{display:flex;align-items:center;flex-wrap:nowrap;min-width:0}
+.vbtn{background:none;border:none;color:#fff;cursor:pointer;padding:6px;border-radius:8px;transition:background .15s;display:flex;align-items:center;justify-content:center;min-width:38px;min-height:38px;flex-shrink:0}
+.vbtn:hover{background:rgba(255,255,255,.12)}
+.vbtn:active{background:rgba(255,255,255,.22)}
+.vbtn svg{width:21px;height:21px;fill:currentColor}
+.vtime{font-size:12px;color:rgba(255,255,255,.9);font-weight:600;white-space:nowrap;margin:0 4px;font-variant-numeric:tabular-nums}
+.spacer{flex:1;min-width:0}
+.vol-g{display:flex;align-items:center;gap:2px}
+.vol-sl{width:0;opacity:0;accent-color:var(--gold);cursor:pointer;transition:width .2s,opacity .2s}
+.vol-g:hover .vol-sl,.vol-g:focus-within .vol-sl{width:56px;opacity:1}
+@media (hover:none) and (pointer:coarse){.vol-g{display:none}}
 .speed-wrap{position:relative}
-.speed-btn{font-size:11px;font-weight:700;min-width:auto;padding:6px 8px;letter-spacing:.3px}
-.speed-menu{position:absolute;bottom:calc(100% + 6px);right:0;background:rgba(10,10,15,.98);border:1px solid var(--brd);border-radius:12px;padding:5px;min-width:96px;display:none;z-index:30;box-shadow:0 4px 20px rgba(0,0,0,.8)}
-.speed-menu.open{display:block}
-.speed-opt{padding:7px 12px;font-size:12px;font-weight:500;border-radius:7px;cursor:pointer;color:var(--text2);transition:background .15s}
+.speed-btn{font-size:12px;font-weight:700;padding:6px 8px;letter-spacing:.3px}
+.speed-menu{position:absolute;bottom:calc(100% + 6px);right:0;background:rgba(10,10,15,.98);border:1px solid var(--brd);border-radius:12px;padding:5px;display:none;grid-template-columns:1fr 1fr;gap:2px;z-index:30;box-shadow:0 4px 20px rgba(0,0,0,.8)}
+.speed-menu.open{display:grid}
+.speed-opt{padding:7px 12px;font-size:12px;font-weight:600;border-radius:7px;cursor:pointer;color:var(--text2);text-align:center;white-space:nowrap}
 .speed-opt:hover{background:var(--bg4);color:var(--text)}
-.speed-opt.on{color:var(--gold);font-weight:700}
-.vol-g{display:flex;align-items:center;gap:3px}
-.vol-sl{width:0;overflow:hidden;accent-color:var(--gold);cursor:pointer;transition:width .2s}
-.vol-g:hover .vol-sl,.vol-g:focus-within .vol-sl{width:52px}
-.sync-b{font-size:9px;font-weight:700;padding:3px 7px;border-radius:5px;background:rgba(34,197,94,.15);color:var(--grn);border:1px solid rgba(34,197,94,.25);white-space:nowrap}
-.sync-b.warn{background:rgba(245,158,11,.15);color:var(--gold);border-color:rgba(245,158,11,.3)}
-.sync-b.bad{background:rgba(239,68,68,.15);color:var(--red);border-color:rgba(239,68,68,.3)}
+.speed-opt.on{color:var(--gold)}
 
-/* TAP OVERLAY */
-.tap-ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.5);cursor:pointer;z-index:6;gap:10px}
-.tap-ov-ico{font-size:56px}
-.tap-ov-lbl{font-size:15px;font-weight:700;color:#fff}
+.tap-ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;background:rgba(0,0,0,.55);cursor:pointer;z-index:6;gap:8px}
+.tap-ov-ico{font-size:48px}
+.tap-ov-lbl{font-size:14px;font-weight:700;color:#fff}
 
-/* CHAT */
-.chat-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-height:0;background:var(--bg)}
-.msgs{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:3px;scrollbar-width:thin;scrollbar-color:var(--brd) transparent}
+/* Chat kartı */
+.chat-card{flex:1;min-height:230px;display:flex;flex-direction:column;overflow:hidden}
+.msgs{flex:1;min-height:0;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:4px;scrollbar-width:thin;scrollbar-color:var(--brd) transparent}
+.chat-empty{margin:auto;color:var(--text3);font-size:12px;text-align:center;padding:20px}
 .msg-row{display:flex;margin-bottom:2px}
 .msg-row.me{justify-content:flex-end}
 .msg-row.other{justify-content:flex-start}
 .msg-row.sys{justify-content:center;margin:5px 0}
-.bubble{max-width:75%;padding:7px 11px;border-radius:16px;font-size:13px;line-height:1.5;word-break:break-word}
+.bubble{max-width:78%;padding:7px 11px;border-radius:16px;font-size:13px;line-height:1.5;word-break:break-word}
 .msg-row.me .bubble{background:var(--msg-me);color:#fff;border-bottom-right-radius:4px}
 .msg-row.other .bubble{background:var(--msg-other);color:var(--text);border-bottom-left-radius:4px;border:1px solid var(--brd)}
 .bubble-name{font-size:10px;font-weight:700;margin-bottom:2px}
 .cn-h{color:var(--gold)}.cn-m{color:var(--blue)}.cn-u{color:var(--acc2)}
-.bubble-time{font-size:10px;color:rgba(255,255,255,.35);margin-top:2px;text-align:right}
+.bubble-time{font-size:10px;color:rgba(255,255,255,.4);margin-top:2px;text-align:right}
 .msg-row.other .bubble-time{color:var(--text3)}
-.sys-bubble{font-size:11px;color:var(--text3);background:var(--bg3);padding:3px 10px;border-radius:10px;border:1px solid var(--brd)}
-.cinp-wrap{padding:9px 12px;border-top:1px solid var(--brd);display:flex;gap:8px;flex-shrink:0;background:var(--bg2)}
-.cinp{flex:1;padding:10px 14px;border:1px solid var(--brd);border-radius:22px;background:var(--bg3);color:var(--text);font-size:14px;outline:none}
+.sys-bubble{font-size:11px;color:var(--text3);background:var(--bg3);padding:3px 10px;border-radius:10px;border:1px solid var(--brd);text-align:center}
+.cinp-wrap{padding:10px;border-top:1px solid var(--brd);display:flex;gap:8px;flex-shrink:0}
+.cinp{flex:1;min-width:0;padding:10px 14px;border:1px solid var(--brd);border-radius:22px;background:var(--bg3);color:var(--text);font-size:16px;outline:none}
 .cinp:focus{border-color:var(--acc2)}
 .cinp::placeholder{color:var(--text3)}
 .csend{padding:10px 18px;border:none;border-radius:22px;background:var(--acc);color:#fff;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap}
 .csend:hover{background:var(--acc2)}
 .csend:active{transform:scale(.96)}
 .cinp:disabled,.csend:disabled{opacity:.3;cursor:not-allowed}
-.muted-note{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:7px;font-size:11px;color:var(--red);text-align:center;margin:4px 12px}
+.muted-note{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:8px;padding:7px;font-size:11px;color:var(--red);text-align:center;margin:4px 10px}
 
-/* TOAST */
-.toast{position:fixed;top:10px;left:50%;transform:translateX(-50%) translateY(-60px);background:rgba(15,15,20,.95);border:1px solid var(--brd);border-radius:10px;padding:9px 16px;font-size:12px;font-weight:600;z-index:500;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;max-width:90vw;overflow:hidden;text-overflow:ellipsis;backdrop-filter:blur(10px);box-shadow:0 4px 20px rgba(0,0,0,.6)}
+.leave-wide{width:100%;padding:14px;border:1px solid var(--brd);border-radius:14px;background:var(--bg2);color:var(--text);font-size:14px;font-weight:700;cursor:pointer;flex-shrink:0;transition:all .15s}
+.leave-wide:hover{border-color:var(--red);color:var(--red)}
+.leave-wide:active{transform:scale(.99)}
+
+/* Telefon üfüqi vəziyyətdə: solda video, sağda otaq + chat (kontrollar ekranın içində qalır) */
+@media (orientation:landscape) and (max-height:520px){
+  .stage{max-width:none;display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,300px);grid-template-rows:auto minmax(0,1fr) auto;gap:8px 10px;height:100%;min-height:0;padding:8px max(10px,env(safe-area-inset-right)) 8px max(10px,env(safe-area-inset-left))}
+  .room-title{display:none}
+  .vid-card{grid-column:1;grid-row:1 / span 3;align-self:center}
+  .room-card{grid-column:2;grid-row:1;padding:8px 10px;gap:6px}
+  .chat-card{grid-column:2;grid-row:2;min-height:0}
+  .leave-wide{grid-column:2;grid-row:3;padding:10px}
+}
+
+/* Bildirişlər (tam ekranın da üstündə görünsün) */
+.toast{position:fixed;top:10px;left:50%;transform:translateX(-50%) translateY(-60px);background:rgba(15,15,20,.96);border:1px solid var(--brd);border-radius:10px;padding:9px 16px;font-size:12px;font-weight:600;z-index:2000;opacity:0;transition:all .3s;white-space:nowrap;pointer-events:none;max-width:92vw;overflow:hidden;text-overflow:ellipsis;backdrop-filter:blur(10px);box-shadow:0 4px 20px rgba(0,0,0,.6)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-/* Chat notif */
-.cnotif{position:fixed;bottom:76px;right:12px;background:var(--bg3);border:1px solid var(--brd);border-radius:10px;padding:7px 12px;font-size:12px;z-index:400;opacity:0;transition:all .25s;pointer-events:none;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.5)}
+.cnotif{position:fixed;bottom:16px;right:12px;background:var(--bg3);border:1px solid var(--brd);border-radius:10px;padding:7px 12px;font-size:12px;z-index:2000;opacity:0;transition:all .25s;pointer-events:none;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;box-shadow:0 2px 12px rgba(0,0,0,.5)}
 .cnotif.show{opacity:1}
-/* Buffer info */
-.buf-info{position:fixed;top:8px;left:50%;transform:translateX(-50%);background:rgba(15,15,20,.92);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:6px 14px;font-size:11px;font-weight:600;color:var(--gold);z-index:450;opacity:0;transition:opacity .3s;pointer-events:none;backdrop-filter:blur(8px);white-space:nowrap}
+.buf-info{position:fixed;top:8px;left:50%;transform:translateX(-50%);background:rgba(15,15,20,.94);border:1px solid rgba(245,158,11,.3);border-radius:8px;padding:6px 14px;font-size:11px;font-weight:600;color:var(--gold);z-index:2000;opacity:0;transition:opacity .3s;pointer-events:none;backdrop-filter:blur(8px);white-space:nowrap}
 .buf-info.show{opacity:1}
 </style>
 </head>
@@ -244,25 +249,28 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 
 <!-- ROOM -->
 <div id="room">
-  <div class="room-head">
+  <div class="stage">
     <div class="room-title">WhiteClub</div>
-    <div class="room-meta">
-      <div class="room-code-wrap">
-        <div class="dot-live"></div>
-        <div class="room-code-lbl">OTAQ</div>
-        <div class="room-code-val" id="rcode">-----</div>
-      </div>
-      <div class="head-btns">
-        <button class="hbtn" onclick="copyCode()">📋 Kod</button>
-        <button class="hbtn" onclick="copyLink()">🔗 Link</button>
-        <button class="hbtn red" id="leave-btn" onclick="leaveRoom()">Çıx</button>
-      </div>
-    </div>
-    <div class="user-chips" id="uchips"></div>
-  </div>
 
-  <div class="room-body">
-    <div class="vid-wrap" id="vw">
+    <div class="rcard room-card">
+      <div class="rc-row">
+        <div class="rc-code">
+          <div class="dot-live"></div>
+          <div>
+            <div class="room-code-lbl">Otaq kodu</div>
+            <div class="room-code-val" id="rcode">-----</div>
+          </div>
+        </div>
+        <div class="rc-btns">
+          <div class="sync-b" id="sbadge">● CANLI</div>
+          <button class="hbtn" onclick="copyCode()">📋 Kod</button>
+          <button class="hbtn" onclick="copyLink()">🔗 Link</button>
+        </div>
+      </div>
+      <div class="user-chips" id="uchips"></div>
+    </div>
+
+    <div class="vid-card" id="vw">
       <video id="vid" preload="auto" playsinline webkit-playsinline x5-playsinline></video>
       <div class="buf-spin" id="bspin"></div>
       <div class="dtap left" id="dtl"><div class="dtap-lbl">⏪ -10s</div></div>
@@ -271,22 +279,19 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
         <div class="prog-wrap" id="pw">
           <div class="prog-track">
             <div class="prog-buf" id="pbuf" style="width:0%"></div>
-            <div class="prog-fill" id="pfill" style="width:0%">
-              <div class="prog-thumb"></div>
-            </div>
+            <div class="prog-fill" id="pfill" style="width:0%"><div class="prog-thumb"></div></div>
           </div>
         </div>
         <div class="ctrl-row">
-          <button class="vbtn" id="pbtn" onclick="togglePlay()"><svg id="pico" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
-          <button class="vbtn" onclick="skip(-10)"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm.5 6 8.5 6V6z"/></svg></button>
-          <button class="vbtn" onclick="skip(10)"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zm-8.5 6 8.5-6v12z"/></svg></button>
+          <button class="vbtn" id="pbtn" onclick="togglePlay()" aria-label="Oynat / dayandır"><svg id="pico" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></button>
+          <button class="vbtn" onclick="skip(-10)" aria-label="10 saniyə geri"><svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/><text x="12" y="16.6" text-anchor="middle" font-size="7.5" font-weight="700" font-family="Arial,sans-serif">10</text></svg></button>
+          <button class="vbtn" onclick="skip(10)" aria-label="10 saniyə irəli"><svg viewBox="0 0 24 24"><g transform="translate(24 0) scale(-1 1)"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></g><text x="12" y="16.6" text-anchor="middle" font-size="7.5" font-weight="700" font-family="Arial,sans-serif">10</text></svg></button>
           <div class="vol-g">
-            <button class="vbtn" onclick="toggleMuteVol()"><svg id="vico" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>
+            <button class="vbtn" onclick="toggleMuteVol()" aria-label="Səs"><svg id="vico" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg></button>
             <input type="range" class="vol-sl" id="vsl" min="0" max="1" step="0.05" value="1" oninput="setVol(this.value)">
           </div>
           <div class="vtime" id="vt">0:00 / 0:00</div>
           <div class="spacer"></div>
-          <div class="sync-b" id="sbadge">● CANLI</div>
           <div class="speed-wrap">
             <button class="vbtn speed-btn" id="splbl" onclick="toggleSM()">1×</button>
             <div class="speed-menu" id="smenu">
@@ -298,22 +303,23 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
               <div class="speed-opt" onclick="setSpd(2)">2×</div>
             </div>
           </div>
-          <!-- FULLSCREEN BTN -->
-          <button class="vbtn" id="fsbtn" onclick="toggleFS()">
+          <button class="vbtn" id="fsbtn" onclick="toggleFS()" aria-label="Tam ekran">
             <svg id="fsico" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
           </button>
         </div>
       </div>
     </div>
 
-    <div class="chat-area">
-      <div class="msgs" id="msgs"></div>
+    <div class="rcard chat-card">
+      <div class="msgs" id="msgs"><div class="chat-empty" id="chat-empty">Hələ mesaj yoxdur. İlk yazan sən ol.</div></div>
       <div id="mnote" class="muted-note" style="display:none">🔇 Siz susturuldunuz</div>
       <div class="cinp-wrap">
-        <input class="cinp" id="cinp" placeholder="Mesaj yaz..." maxlength="200" onkeydown="if(event.key==='Enter')sendMsg()">
+        <input class="cinp" id="cinp" placeholder="Mesaj yaz..." maxlength="200" autocomplete="off" onkeydown="if(event.key==='Enter')sendMsg()">
         <button class="csend" id="csend" onclick="sendMsg()">Göndər</button>
       </div>
     </div>
+
+    <button class="leave-wide" id="leave-btn" onclick="leaveRoom()">Otaqdan çıx</button>
   </div>
 </div>
 
@@ -339,6 +345,7 @@ let offs=[],chatMuted=false,syncCd=false,vidReady=false;
 let isDrag=false,ctrlT=null,mutedVol=false,curSpd=1;
 let lastDBState=null,lastPushedTime=null,lastPushedAt=null;
 let bufferingTimer=null,isFakeFS=false,srvOff=0,vidBound=false;
+let selfPlay=false,selfPause=false,holdPause=false,lastAnyBuf=false,bufDebounce=null,resumeT=null,holdMax=null;
 DB.ref('.info/serverTimeOffset').on('value',sn=>{srvOff=sn.val()||0;});
 function nowS(){return Date.now()+srvOff;}
 
@@ -417,10 +424,11 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&isFakeFS)exitFS();}
 function showCtrl(hold){
   vw.classList.add('cs');
   clearTimeout(ctrlT);
-  if(!hold)ctrlT=setTimeout(()=>{if(!isDrag)vw.classList.remove('cs');},3500);
+  // Video dayanıbsa kontrollar görünən qalır (YouTube kimi)
+  if(!hold)ctrlT=setTimeout(()=>{if(!isDrag&&!vid.paused)vw.classList.remove('cs');},3500);
 }
 vw.addEventListener('mousemove',()=>showCtrl(false));
-vw.addEventListener('mouseleave',()=>{if(!isDrag){clearTimeout(ctrlT);vw.classList.remove('cs');}});
+vw.addEventListener('mouseleave',()=>{if(!isDrag&&!vid.paused){clearTimeout(ctrlT);vw.classList.remove('cs');}});
 
 // TOUCH
 let lastTap=0,tapX=0,tapTm=null;
@@ -596,7 +604,8 @@ async function _join(){
 // START ROOM
 function startRoom(){
   $('rcode').textContent=room.code;
-  if(me.host){$('leave-btn').textContent='Otağı bitir';}
+  if(me.host){$('leave-btn').textContent='Otağı bitir (hamı üçün)';}
+  showCtrl(true);
 
   vid.src=room.url;vid.preload='auto';vid.load();vid.playbackRate=curSpd;
 
@@ -615,9 +624,9 @@ function startRoom(){
   // HOST HEARTBEAT — only updates time, not seeked flag
   if(me.host){
     const hb=setInterval(()=>{
-      if(vRef&&vidReady&&!vid.paused){
-        // Update time+at but keep seeked=false so guests don't show toast
-        vRef.update({time:vid.currentTime,at:nowS(),seeked:false});
+      if(vRef&&vidReady&&!vid.paused&&!holdPause){
+        // playing də yazılır: baza ilə real vəziyyət uyğunsuz qalarsa özü düzəlir
+        vRef.update({playing:true,time:vid.currentTime,at:nowS(),seeked:false});
       }
     },3000);
     offs.push(()=>clearInterval(hb));
@@ -631,6 +640,19 @@ function startRoom(){
     if(my){me.mod=!!my.mod;chatMuted=!!my.muted;$('mnote').style.display=chatMuted?'block':'none';$('cinp').disabled=chatMuted;$('csend').disabled=chatMuted;}
     const buf=Object.values(u).filter(x=>x.buffering&&x.id!==me.id).map(x=>x.name);
     buf.length?showBufInfo('⏳ '+buf.join(', ')+' gözləyir...'):hideBufInfo();
+    const anyBuf=Object.values(u).some(x=>x.buffering);
+    lastAnyBuf=anyBuf;
+    if(me.host&&vidReady){
+      if(anyBuf&&!vid.paused){
+        holdPause=true;selfPause=true;setTimeout(()=>{selfPause=false;},1500);
+        vid.pause();pushVid(false,false);
+        toast('⏸ '+(buf.length?buf.join(', '):'Sən')+' gözləyir, hamı dayandı');
+        clearTimeout(holdMax);holdMax=setTimeout(resumeFromHold,20000); // ilişib qalmasın
+      } else if(!anyBuf&&holdPause){
+        clearTimeout(resumeT);
+        resumeT=setTimeout(()=>{if(!lastAnyBuf)resumeFromHold();},700);
+      }
+    }
   });
   offs.push(()=>DB.ref('rooms/'+room.code+'/users').off('value',ul));
 
@@ -651,24 +673,38 @@ function bindVideoEvents(){
     $('bspin').classList.remove('show');
     toast('⚠️ Video yüklənmədi. Link bloklanıb və ya format dəstəklənmir',7000);
   });
+  // Yüklənmə: qısa "waiting" sayılmır, 1.2 san davam edərsə hamıya "gözləyir" kimi bildirilir
+  const bufOk=()=>{clearTimeout(bufDebounce);$('bspin').classList.remove('show');if(uRef)uRef.child('buffering').set(false);};
   vid.addEventListener('waiting',()=>{
     $('bspin').classList.add('show');
-    if(uRef)uRef.child('buffering').set(true);
-    if(me.host){
-      clearTimeout(bufferingTimer);
-      bufferingTimer=setTimeout(()=>{
-        if(vid.readyState<3&&!vid.paused){vid.pause();pushVid(false,false);toast('⏸ Yüklənir...');}
-      },2000);
-    }
+    clearTimeout(bufDebounce);
+    bufDebounce=setTimeout(()=>{if(uRef&&vid.readyState<3)uRef.child('buffering').set(true);},1200);
   });
-  vid.addEventListener('playing',()=>{$('bspin').classList.remove('show');clearTimeout(bufferingTimer);if(uRef)uRef.child('buffering').set(false);});
-  vid.addEventListener('canplay',()=>{$('bspin').classList.remove('show');if(uRef)uRef.child('buffering').set(false);applyLastState();});
+  vid.addEventListener('playing',bufOk);
+  vid.addEventListener('canplay',()=>{bufOk();applyLastState();});
   vid.addEventListener('loadedmetadata',()=>{vidReady=true;applyLastState();});
   vid.addEventListener('timeupdate',updTime);
   vid.addEventListener('progress',updBuf);
-  vid.addEventListener('play',()=>{if(!syncCd&&canCtrl())pushVid(true,false);updatePBtn(false);});
-  vid.addEventListener('pause',()=>{if(!syncCd&&canCtrl())pushVid(false,false);updatePBtn(true);});
+  // selfPlay/selfPause: proqramın özünün (sinxron) çağırışı ilə istifadəçi hərəkətini ayırır
+  vid.addEventListener('play',()=>{
+    if(selfPlay)selfPlay=false;
+    else{holdPause=false;if(canCtrl())pushVid(true,false);}
+    updatePBtn(false);showCtrl(false);
+  });
+  vid.addEventListener('pause',()=>{
+    if(selfPause)selfPause=false;
+    else{holdPause=false;if(canCtrl())pushVid(false,false);}
+    updatePBtn(true);showCtrl(true);
+  });
 
+}
+
+function resumeFromHold(){
+  clearTimeout(holdMax);
+  if(!holdPause||!vid.paused)return;
+  holdPause=false;selfPlay=true;setTimeout(()=>{selfPlay=false;},1500);
+  vid.play().then(()=>pushVid(true,false)).catch(()=>{selfPlay=false;});
+  toast('▶ Hamı hazırdır, davam edir');
 }
 
 // APPLY VIDEO STATE
@@ -690,13 +726,14 @@ function applyVid(v,prev){
     toast(v.by+' videoyu '+(v.playing?'▶ başlatdı':'⏸ dayandırdı'));
   }
 
-  syncCd=true;
   if(drift>2)vid.currentTime=Math.max(0,Math.min(vid.duration||99999,target));
   if(v.playing&&vid.paused){
     const wm=vid.muted;vid.muted=true;
-    vid.play().then(()=>setTimeout(()=>vid.muted=wm,300)).catch(()=>showTapToPlay());
+    selfPlay=true;setTimeout(()=>{selfPlay=false;},1500);
+    vid.play().then(()=>setTimeout(()=>{vid.muted=wm;},300)).catch(()=>{selfPlay=false;vid.muted=wm;showTapToPlay();});
     updatePBtn(false);
   } else if(!v.playing&&!vid.paused){
+    selfPause=true;setTimeout(()=>{selfPause=false;},1500);
     vid.pause();updatePBtn(true);
   }
 
@@ -704,7 +741,6 @@ function applyVid(v,prev){
   if(drift<1){sb.textContent='● CANLI';sb.className='sync-b';}
   else if(drift<4){sb.textContent='~'+drift.toFixed(0)+'s';sb.className='sync-b warn';}
   else{sb.textContent='SİNX...';sb.className='sync-b bad';}
-  setTimeout(()=>syncCd=false,400);
 }
 function applyLastState(){if(lastDBState){vidReady=true;applyVid(lastDBState,null);}}
 
@@ -780,6 +816,7 @@ function sendMsg(){
 }
 function appendMsg(m){
   const box=$('msgs'),d=document.createElement('div');
+  const emp=$('chat-empty');if(emp)emp.remove();
   const time=new Date(m.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   const isMe=m.id===me.id;
   if(m.sys){
@@ -805,13 +842,14 @@ function leaveRoom(){
 function cleanup(){
   offs.forEach(f=>f());offs=[];
   vid.src='';vidReady=false;chatMuted=false;lastDBState=null;
-  clearTimeout(bufferingTimer);
+  clearTimeout(bufferingTimer);clearTimeout(bufDebounce);clearTimeout(resumeT);clearTimeout(holdMax);
+  selfPlay=selfPause=holdPause=lastAnyBuf=false;
   rRef=uRef=cRef=vRef=null;
   me={name:'',id:'',host:false,mod:false};room={code:'',url:''};
-  $('msgs').innerHTML='';$('uchips').innerHTML='';
+  $('msgs').innerHTML='<div class="chat-empty" id="chat-empty">Hələ mesaj yoxdur. İlk yazan sən ol.</div>';$('uchips').innerHTML='';
   $('room').classList.remove('on');vw.classList.remove('cs');
   if(isFakeFS)exitFS();
-  $('leave-btn').textContent='Çıx';hideBufInfo();
+  $('leave-btn').textContent='Otaqdan çıx';hideBufInfo();
 }
 
 // URL join
