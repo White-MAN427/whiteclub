@@ -90,6 +90,11 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 /* Tam ekran (CSS ilə — bütün telefonlarda işləyir) */
 #room.fake-fs .vid-card{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;aspect-ratio:auto;border:0;border-radius:0;z-index:1000}
 #room.fake-fs .vctrl{padding-left:max(12px,env(safe-area-inset-left));padding-right:max(12px,env(safe-area-inset-right));padding-bottom:calc(12px + env(safe-area-inset-bottom))}
+/* Brauzerin standart tam ekranı (yalnız video kartı) */
+.vid-card:fullscreen{width:100%;height:100%;max-width:none;aspect-ratio:auto;border:0;border-radius:0;background:#000}
+.vid-card:-webkit-full-screen{width:100%;height:100%;max-width:none;aspect-ratio:auto;border:0;border-radius:0;background:#000}
+.vid-card:fullscreen .vctrl{padding-left:max(14px,env(safe-area-inset-left));padding-right:max(14px,env(safe-area-inset-right));padding-bottom:calc(14px + env(safe-area-inset-bottom))}
+.vid-card:-webkit-full-screen .vctrl{padding-left:14px;padding-right:14px;padding-bottom:14px}
 
 .buf-spin{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:44px;height:44px;border:3px solid rgba(255,255,255,.15);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;display:none;z-index:5}
 .buf-spin.show{display:block}
@@ -384,41 +389,71 @@ function hideBufInfo(){$('buf-info').classList.remove('show');}
 function copyCode(){navigator.clipboard.writeText(room.code).then(()=>toast('📋 Kod kopyalandı: '+room.code)).catch(()=>{});}
 function copyLink(){const u=window.location.href.split('?')[0]+'?join='+room.code;navigator.clipboard.writeText(u).then(()=>toast('🔗 Link kopyalandı')).catch(()=>{});}
 
-// FULLSCREEN — CSS ilə video tam ekran + brauzer panellərini gizlətməyə cəhd
-function enterFS(){
-  isFakeFS=true;
-  $('room').classList.add('fake-fs');
-  setFSIcon(true);
-  showCtrl(false);
-  const el=document.documentElement;
-  const req=el.requestFullscreen||el.webkitRequestFullscreen||el.mozRequestFullScreen||el.msRequestFullscreen;
-  if(req){try{const p=req.call(el);if(p&&p.catch)p.catch(()=>{});}catch(e){}}
-  try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(()=>{});}catch(e){}
-}
-function exitFS(){
-  isFakeFS=false;
-  $('room').classList.remove('fake-fs');
-  setFSIcon(false);
-  if(document.fullscreenElement||document.webkitFullscreenElement){
-    try{(document.exitFullscreen||document.webkitExitFullscreen||document.mozCancelFullScreen).call(document);}catch(e){}
-  }
-  try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){}
-}
-function toggleFS(){isFakeFS?exitFS():enterFS();}
+// FULLSCREEN
+// 1) Əsas: brauzerin standart tam ekranı yalnız video kartına (vw) tətbiq olunur
+// 2) Ehtiyat (iPhone Safari və s.): CSS ilə tam ekran, ölçü real görünən sahəyə görə hesablanır
+let fsMode=null; // 'native' | 'css' | null
 function setFSIcon(on){
   $('fsico').innerHTML=on
     ?'<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>'
     :'<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
 }
-// İstifadəçi brauzerin öz düyməsi ilə (geri/swipe) çıxarsa, CSS rejimi də bağlansın
+function fsElement(){return document.fullscreenElement||document.webkitFullscreenElement||null;}
+function cssFsSize(){
+  if(fsMode!=='css')return;
+  vw.style.width=window.innerWidth+'px';
+  vw.style.height=window.innerHeight+'px';
+}
+function enterCssFS(){
+  fsMode='css';isFakeFS=true;
+  $('room').classList.add('fake-fs');
+  setFSIcon(true);cssFsSize();showCtrl(false);
+}
+function enterFS(){
+  showCtrl(false);
+  const req=vw.requestFullscreen||vw.webkitRequestFullscreen;
+  if(!req){enterCssFS();return;}
+  let pr;
+  try{pr=req.call(vw);}catch(e){enterCssFS();return;}
+  if(pr&&pr.then){
+    pr.then(()=>{
+      try{if(screen.orientation&&screen.orientation.lock)screen.orientation.lock('landscape').catch(()=>{});}catch(e){}
+    }).catch(()=>{if(!fsElement())enterCssFS();});
+  }
+}
+function exitFS(){
+  if(fsElement()){
+    try{(document.exitFullscreen||document.webkitExitFullscreen).call(document);}catch(e){}
+  }
+  if(fsMode==='css'){
+    $('room').classList.remove('fake-fs');
+    vw.style.width='';vw.style.height='';
+  }
+  fsMode=null;isFakeFS=false;setFSIcon(false);
+  try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){}
+}
+function toggleFS(){(fsMode||fsElement())?exitFS():enterFS();}
 function onFSChange(){
-  const nativeOn=!!(document.fullscreenElement||document.webkitFullscreenElement);
-  if(!nativeOn&&isFakeFS&&window.__nativeFSWasOn){exitFS();}
-  window.__nativeFSWasOn=nativeOn;
+  const fe=fsElement();
+  // Tam ekranda yalnız həmin elementin içi göstərilir: bildirişlər onun içinə köçürülür
+  const host=fe||document.body;
+  ['toast','cnotif','buf-info'].forEach(id=>{const el=$(id);if(el&&el.parentNode!==host)host.appendChild(el);});
+  if(fe===vw){fsMode='native';isFakeFS=true;setFSIcon(true);showCtrl(false);}
+  else if(fsMode==='native'){
+    fsMode=null;isFakeFS=false;setFSIcon(false);
+    try{if(screen.orientation&&screen.orientation.unlock)screen.orientation.unlock();}catch(e){}
+  }
 }
 document.addEventListener('fullscreenchange',onFSChange);
 document.addEventListener('webkitfullscreenchange',onFSChange);
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&isFakeFS)exitFS();});
+window.addEventListener('resize',cssFsSize);
+window.addEventListener('orientationchange',()=>setTimeout(cssFsSize,250));
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&fsMode==='css')exitFS();});
+// Kompüterdə videoya cüt klik = tam ekran (YouTube kimi)
+vw.addEventListener('dblclick',e=>{
+  if(e.target.closest('.vctrl'))return;
+  if(window.matchMedia('(pointer:fine)').matches)toggleFS();
+});
 
 // CONTROLS SHOW/HIDE
 function showCtrl(hold){
@@ -682,7 +717,8 @@ function bindVideoEvents(){
   });
   vid.addEventListener('playing',bufOk);
   vid.addEventListener('canplay',()=>{bufOk();applyLastState();});
-  vid.addEventListener('loadedmetadata',()=>{vidReady=true;applyLastState();});
+  vid.addEventListener('loadedmetadata',()=>{vidReady=true;updTime();applyLastState();});
+  vid.addEventListener('durationchange',updTime);
   vid.addEventListener('timeupdate',updTime);
   vid.addEventListener('progress',updBuf);
   // selfPlay/selfPause: proqramın özünün (sinxron) çağırışı ilə istifadəçi hərəkətini ayırır
