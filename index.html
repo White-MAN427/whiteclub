@@ -47,14 +47,13 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .choice-s{font-size:12px;color:var(--text2);margin-top:3px}
 .code-box{font-size:34px;font-weight:900;letter-spacing:10px;text-align:center;padding:18px;background:var(--bg3);border-radius:14px;border:1px solid var(--brd);cursor:pointer;margin:14px 0;color:var(--gold)}
 .code-box:hover{background:var(--bg4)}
-.ver{font-size:10px;color:var(--text3);letter-spacing:2px;margin-top:10px}
 .code-hint{font-size:11px;color:var(--text3);text-align:center;margin-top:-8px;margin-bottom:14px}
 
 /* ROOM — mərkəzdə dar sütun (HerrWParty tərzi) */
 #room{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;opacity:0;pointer-events:none;transition:opacity .25s}
 #room.on{opacity:1;pointer-events:all}
 #room.fake-fs{overflow:hidden}
-.stage{width:100%;max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;gap:12px;padding:10px 12px calc(14px + env(safe-area-inset-bottom))}
+.stage{width:100%;max-width:560px;margin:0 auto;height:100%;min-height:0;display:flex;flex-direction:column;gap:12px;padding:10px 12px calc(14px + env(safe-area-inset-bottom))}
 .room-title{font-size:20px;font-weight:900;color:var(--gold);text-align:center;letter-spacing:-.5px;padding:6px 0 10px;border-bottom:1px solid var(--brd);flex-shrink:0}
 .rcard{background:var(--bg2);border:1px solid var(--brd);border-radius:14px}
 
@@ -141,8 +140,8 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
 .tap-ov-lbl{font-size:14px;font-weight:700;color:#fff}
 
 /* Chat kartı */
-.chat-card{flex:1;min-height:230px;display:flex;flex-direction:column;overflow:hidden}
-.msgs{flex:1;min-height:0;overflow-y:auto;padding:12px;display:flex;flex-direction:column;gap:4px;scrollbar-width:thin;scrollbar-color:var(--brd) transparent}
+.chat-card{flex:1 1 auto;min-height:180px;display:flex;flex-direction:column;overflow:hidden}
+.msgs{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;padding:12px;display:flex;flex-direction:column;gap:4px;scrollbar-width:thin;scrollbar-color:var(--brd) transparent}
 .chat-empty{margin:auto;color:var(--text3);font-size:12px;text-align:center;padding:20px}
 .msg-row{display:flex;margin-bottom:2px}
 .msg-row.me{justify-content:flex-end}
@@ -210,7 +209,6 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       <div class="choice-s">Dostunun otaq kodunu daxil et</div>
     </button>
   </div>
-  <div class="ver">v2.3</div>
 </div>
 
 <!-- CREATE -->
@@ -237,7 +235,7 @@ html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);fon
       style="text-transform:uppercase;letter-spacing:6px;font-weight:800;font-size:22px;text-align:center;color:var(--gold)"
       oninput="this.value=this.value.toUpperCase()">
     <div class="err" id="j-err"></div>
-    <button class="btn btn-acc" onclick="doJoin()">Qoşul →</button>
+    <button class="btn btn-acc" id="j-btn" onclick="doJoin()">Qoşul →</button>
     <button class="btn btn-g" onclick="go('scr-home')">← Geri</button>
   </div>
 </div>
@@ -349,7 +347,9 @@ let me={name:'',id:'',host:false,mod:false};
 let room={code:'',url:''};
 let rRef=null,uRef=null,cRef=null,vRef=null;
 let offs=[],chatMuted=false,syncCd=false,vidReady=false;
-let isDrag=false,ctrlT=null,mutedVol=false,curSpd=1;
+const MAX_CHAT_MESSAGES=150;
+let sendingMsg=false,leavingRoom=false,kickNoticePending=false,kickCheckTimer=null;
+let isDrag=false,ctrlT=null,mutedVol=false,curSpd=1,lastVolume=1;
 let lastDBState=null,lastPushedTime=null,lastPushedAt=null;
 let bufferingTimer=null,isFakeFS=false,srvOff=0,vidBound=false;
 let selfPlay=false,selfPause=false,holdPause=false,lastAnyBuf=false,bufDebounce=null,resumeT=null,holdMax=null;
@@ -388,8 +388,27 @@ function chatNotif(msg){playBeep();const el=$('cnotif');el.textContent=msg;el.cl
 function showBufInfo(msg){const el=$('buf-info');el.textContent=msg;el.classList.add('show');}
 function hideBufInfo(){$('buf-info').classList.remove('show');}
 
-function copyCode(){navigator.clipboard.writeText(room.code).then(()=>toast('📋 Kod kopyalandı: '+room.code)).catch(()=>{});}
-function copyLink(){const u=window.location.href.split('?')[0]+'?join='+room.code;navigator.clipboard.writeText(u).then(()=>toast('🔗 Link kopyalandı')).catch(()=>{});}
+async function copyText(text,successMessage){
+  try{
+    if(navigator.clipboard&&window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+    }else{
+      const ta=document.createElement('textarea');
+      ta.value=text;ta.setAttribute('readonly','');
+      ta.style.position='fixed';ta.style.opacity='0';ta.style.pointerEvents='none';
+      document.body.appendChild(ta);ta.select();
+      const ok=document.execCommand('copy');ta.remove();
+      if(!ok)throw new Error('Kopyalama mümkün olmadı');
+    }
+    toast(successMessage);
+  }catch(e){toast('Kopyalama alınmadı. Linki əl ilə seçib kopyala.',4000);}
+}
+function copyCode(){if(room.code)copyText(room.code,'📋 Kod kopyalandı: '+room.code);}
+function copyLink(){
+  if(!room.code)return;
+  const u=new URL(window.location.href);u.search='';u.searchParams.set('join',room.code);
+  copyText(u.href,'🔗 Link kopyalandı');
+}
 
 // FULLSCREEN
 // 1) Əsas: brauzerin standart tam ekranı yalnız video kartına (vw) tətbiq olunur
@@ -403,8 +422,10 @@ function setFSIcon(on){
 function fsElement(){return document.fullscreenElement||document.webkitFullscreenElement||null;}
 function cssFsSize(){
   if(fsMode!=='css')return;
-  vw.style.width=window.innerWidth+'px';
-  vw.style.height=window.innerHeight+'px';
+  const w=window.visualViewport?.width||window.innerWidth;
+  const h=window.visualViewport?.height||window.innerHeight;
+  vw.style.width=w+'px';
+  vw.style.height=h+'px';
 }
 function enterCssFS(){
   fsMode='css';isFakeFS=true;
@@ -449,6 +470,7 @@ function onFSChange(){
 document.addEventListener('fullscreenchange',onFSChange);
 document.addEventListener('webkitfullscreenchange',onFSChange);
 window.addEventListener('resize',cssFsSize);
+if(window.visualViewport)window.visualViewport.addEventListener('resize',cssFsSize);
 window.addEventListener('orientationchange',()=>setTimeout(cssFsSize,250));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&fsMode==='css')exitFS();});
 // Kompüterdə videoya cüt klik = tam ekran (YouTube kimi)
@@ -492,11 +514,13 @@ function skipFlash(s,side){
 function getP(e){
   const r=pw.getBoundingClientRect();
   const x=(e.clientX!=null?e.clientX:e.touches?.[0]?.clientX??0)-r.left;
+  if(!r.width)return 0;
   return Math.max(0,Math.min(1,x/r.width));
 }
 function doSeek(pct){
   if(!canCtrl()){toast('Yalnız host/idarəçi idarə edə bilər');return;}
-  const t=pct*(vid.duration||0);
+  if(!vidReady||!Number.isFinite(vid.duration)){toast('Video hələ hazır deyil');return;}
+  const t=pct*vid.duration;
   vid.currentTime=t;
   pushVid(!vid.paused,true);
 }
@@ -508,8 +532,8 @@ document.addEventListener('touchmove',e=>{if(isDrag){doSeek(getP(e));e.preventDe
 document.addEventListener('touchend',()=>{if(isDrag){isDrag=false;pw.classList.remove('drag');showCtrl(false);}});
 
 // VOLUME
-function setVol(v){vid.volume=parseFloat(v);mutedVol=v==0;updateVI();}
-function toggleMuteVol(){mutedVol=!mutedVol;vid.volume=mutedVol?0:(parseFloat($('vsl').value)||1);if(mutedVol)$('vsl').value=0;updateVI();}
+function setVol(v){const n=Math.max(0,Math.min(1,parseFloat(v)||0));vid.volume=n;if(n>0)lastVolume=n;mutedVol=n===0;$('vsl').value=n;updateVI();}
+function toggleMuteVol(){if(vid.volume>0){lastVolume=vid.volume;vid.volume=0;mutedVol=true;}else{vid.volume=lastVolume||1;mutedVol=false;} $('vsl').value=vid.volume;updateVI();}
 function updateVI(){$('vico').innerHTML=vid.volume===0?'<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3 3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4 9.91 6.09 12 8.18V4z"/>':'<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>';}
 
 // SPEED
@@ -596,11 +620,21 @@ function testVideoUrl(url,ms=15000){
 
 function setErr(msg,info){const e=$('c-err');e.textContent=msg;e.classList.toggle('info',!!info);}
 
+async function createUniqueRoom(data){
+  for(let attempt=0;attempt<6;attempt++){
+    const code=genCode(),ref=DB.ref('rooms/'+code);
+    const result=await ref.transaction(current=>current===null?data:undefined,undefined,false);
+    if(result.committed)return{code,ref};
+  }
+  throw new Error('Unikal otaq kodu yaradıla bilmədi');
+}
+
 async function doCreate(){
   const name=$('c-name').value.trim(),raw=$('c-url').value.trim();
   if(!name){setErr('Adını daxil et');return;}
   if(!raw){setErr('Video linkini daxil et');return;}
-  const btn=$('c-btn');btn.disabled=true;
+  const btn=$('c-btn');if(btn.disabled)return;btn.disabled=true;
+  let reservedRef=null;
   try{
     setErr('Link yoxlanılır...',true);
     const r=await resolveVideoUrl(raw);
@@ -608,45 +642,73 @@ async function doCreate(){
     const t=await testVideoUrl(r.url);
     if(!t.ok){setErr(t.error+hostHint(r.url));return;}
     setErr('Yaradılır...',true);
-    me={name,id:genId(),host:true,mod:false};room={code:genCode(),url:r.url};
-    rRef=DB.ref('rooms/'+room.code);
-    await rRef.set({hostId:me.id,url:r.url,video:{playing:false,time:0,at:nowS(),by:'',seeked:false},created:Date.now()});
-    rRef.onDisconnect().remove();
+    me={name,id:genId(),host:true,mod:false};
+    const created=await createUniqueRoom({hostId:me.id,url:r.url,video:{playing:false,time:0,at:nowS(),by:'',seeked:false},created:Date.now()});
+    reservedRef=created.ref;
+    await reservedRef.onDisconnect().remove();
+    rRef=reservedRef;room={code:created.code,url:r.url};
     $('show-code').textContent=room.code;go('scr-wait');setErr('');
   }catch(e){
-    setErr('Xəta baş verdi. İnterneti yoxla və yenidən cəhd et.');
+    if(reservedRef){try{await reservedRef.remove();}catch(_){} }
+    rRef=null;me={name:'',id:'',host:false,mod:false};room={code:'',url:''};
+    setErr('Otaq yaradıla bilmədi. İnterneti və Firebase icazələrini yoxla.');
   }finally{btn.disabled=false;}
 }
-async function enterRoom(){await _join();startRoom();}
-function cancelRoom(){if(rRef)rRef.remove();rRef=null;go('scr-home');}
+
+async function enterRoom(){
+  const btn=document.querySelector('#scr-wait .btn-acc');
+  if(btn)btn.disabled=true;
+  try{await _join();startRoom();}
+  catch(e){
+    try{if(uRef)await uRef.remove();}catch(_){}
+    try{if(rRef)await rRef.remove();}catch(_){}
+    cleanup();go('scr-home');toast('Otağa daxil olmaq alınmadı. İnterneti və Firebase icazələrini yoxla.',4500);
+  }
+  finally{if(btn)btn.disabled=false;}
+}
+async function cancelRoom(){
+  try{if(rRef)await rRef.remove();}catch(e){toast('Otağı silmək alınmadı',3500);}
+  cleanup();go('scr-home');
+}
 
 async function doJoin(){
   const name=$('j-name').value.trim(),code=$('j-code').value.trim().toUpperCase(),err=$('j-err');
+  const btn=$('j-btn');
   if(!name){err.textContent='Adını daxil et';return;}
   if(code.length!==5){err.textContent='5 simvollu kod daxil et';return;}
-  err.textContent='Qoşulunur...';
-  const snap=await DB.ref('rooms/'+code).get();
-  if(!snap.exists()){err.textContent='❌ Otaq tapılmadı';return;}
-  me={name,id:genId(),host:false,mod:false};room={code,url:snap.val().url};
-  rRef=DB.ref('rooms/'+code);await _join();err.textContent='';startRoom();
+  if(btn.disabled)return;btn.disabled=true;err.textContent='Qoşulunur...';
+  try{
+    const snap=await DB.ref('rooms/'+code).get();
+    if(!snap.exists()||!snap.val()?.url){err.textContent='❌ Otaq tapılmadı və ya artıq bağlanıb';return;}
+    me={name,id:genId(),host:false,mod:false};room={code,url:snap.val().url};
+    rRef=DB.ref('rooms/'+code);await _join();err.textContent='';startRoom();
+  }catch(e){
+    if(uRef){try{await uRef.remove();}catch(_){}}
+    cleanup();
+    err.textContent='Qoşulmaq alınmadı. İnterneti və Firebase icazələrini yoxla.';
+  }finally{btn.disabled=false;}
 }
 async function _join(){
+  if(!room.code||!me.id||!rRef)throw new Error('Otaq məlumatı natamamdır');
+  const roomSnap=await rRef.get();
+  if(!roomSnap.exists())throw new Error('Otaq artıq mövcud deyil');
   uRef=DB.ref('rooms/'+room.code+'/users/'+me.id);
   await uRef.set({name:me.name,id:me.id,host:me.host,mod:me.mod,muted:false,buffering:false,joined:Date.now()});
-  uRef.onDisconnect().remove();
+  await uRef.onDisconnect().remove();
   vRef=DB.ref('rooms/'+room.code+'/video');
   cRef=DB.ref('rooms/'+room.code+'/chat');
 }
 
 // START ROOM
 function startRoom(){
+  if(!room.code||!rRef||!uRef||!vRef||!cRef)return;
+  lastDBState=null;vidReady=false;leavingRoom=false;
   $('rcode').textContent=room.code;
   if(me.host){$('leave-btn').textContent='Otağı bitir (hamı üçün)';}
   showCtrl(true);
 
-  vid.src=room.url;vid.preload='auto';vid.load();vid.playbackRate=curSpd;
-
   bindVideoEvents();
+  vid.src=room.url;vid.preload='auto';vid.load();vid.playbackRate=curSpd;
 
   // VIDEO SYNC
   const vl=vRef.on('value',snap=>{
@@ -654,7 +716,6 @@ function startRoom(){
     const prev=lastDBState;
     lastDBState=snap.val();
     if(vidReady)applyVid(lastDBState,prev);
-    else setTimeout(()=>{vidReady=true;if(lastDBState)applyVid(lastDBState,null);},1500);
   });
   offs.push(()=>vRef.off('value',vl));
 
@@ -693,11 +754,24 @@ function startRoom(){
   });
   offs.push(()=>DB.ref('rooms/'+room.code+'/users').off('value',ul));
 
-  const rl=rRef.on('value',snap=>{if(!snap.exists()&&!me.host){toast('🚫 Host otağı bitirdi',4000);setTimeout(()=>{cleanup();go('scr-home');},1500);}});
+  const joinedCode=room.code,joinedUser=me.id;
+  const rl=rRef.on('value',snap=>{
+    if(!snap.exists()&&!me.host&&!leavingRoom&&room.code===joinedCode&&me.id===joinedUser){
+      toast('🚫 Host otağı bitirdi',4000);
+      setTimeout(()=>{if(room.code===joinedCode&&me.id===joinedUser){cleanup();go('scr-home');}},1500);
+    }
+  });
   offs.push(()=>rRef.off('value',rl));
 
-  const cl=cRef.limitToLast(150).on('child_added',snap=>appendMsg(snap.val()));
-  offs.push(()=>cRef.off('child_added',cl));
+  const chatQuery=cRef.limitToLast(MAX_CHAT_MESSAGES);
+  let initialChatLoad=true;
+  const cl=chatQuery.on('child_added',snap=>appendMsg(snap.val(),!initialChatLoad));
+  const cv=chatQuery.on('value',()=>{
+    initialChatLoad=false;
+    const box=$('msgs');box.scrollTop=box.scrollHeight;
+    chatQuery.off('value',cv);
+  });
+  offs.push(()=>{chatQuery.off('child_added',cl);chatQuery.off('value',cv);});
   if(!me.host)cRef.push({sys:true,text:me.name+' otağa qoşuldu',ts:Date.now()});
 
   $('room').classList.add('on');go('__none__');
@@ -820,24 +894,34 @@ function showTapToPlay(){
 
 // USERS
 function renderUsers(users){
-  $('uchips').innerHTML=Object.values(users).map(u=>{
-    const isMe=u.id===me.id,canAct=canCtrl()&&!u.host&&!isMe;
-    const col=avatarColor(u.name);
-    let badge=u.host?'<span class="ubadge-sm ub-host">HOST</span>':u.mod?'<span class="ubadge-sm ub-mod">MOD</span>':'';
-    let acts='';
-    if(canAct){
-      acts+=u.muted
-        ?`<button class="uact-sm" onclick="unmuteU('${u.id}','${esc(u.name)}')" title="Aç">🔊</button>`
-        :`<button class="uact-sm" onclick="muteU('${u.id}','${esc(u.name)}')" title="Sustur">🔇</button>`;
-      acts+=`<button class="uact-sm" onclick="kickU('${u.id}','${esc(u.name)}')" title="Çıxart">✕</button>`;
-      if(me.host)acts+=u.mod
-        ?`<button class="uact-sm" onclick="removeM('${u.id}','${esc(u.name)}')" title="Mod al">⭐</button>`
-        :`<button class="uact-sm" onclick="giveM('${u.id}','${esc(u.name)}')" title="Mod ver">☆</button>`;
+  const host=$('uchips'),frag=document.createDocumentFragment();
+  Object.entries(users||{}).forEach(([key,u])=>{
+    if(!u)return;
+    const uid=String(key),name=String(u.name||'İstifadəçi');
+    const isMe=uid===me.id,canAct=canCtrl()&&!u.host&&!isMe;
+    const chip=document.createElement('div');
+    chip.className='uchip'+(u.host?' is-host':u.mod?' is-mod':'');
+    const avatar=document.createElement('div');avatar.className='uavatar';avatar.style.background=avatarColor(name);avatar.textContent=(name.charAt(0)||'?').toUpperCase();
+    const label=document.createElement('span');label.textContent=name+(isMe?' (sən)':'');
+    chip.append(avatar,label);
+    if(u.host||u.mod){
+      const badge=document.createElement('span');badge.className='ubadge-sm '+(u.host?'ub-host':'ub-mod');badge.textContent=u.host?'HOST':'MOD';chip.appendChild(badge);
     }
-    return `<div class="uchip${u.host?' is-host':u.mod?' is-mod':''}">
-      <div class="uavatar" style="background:${col}">${u.name[0].toUpperCase()}</div>
-      <span>${esc(u.name)}${isMe?' (sən)':''}</span>${badge}${acts}</div>`;
-  }).join('');
+    const addAction=(symbol,title,handler)=>{
+      const b=document.createElement('button');b.type='button';b.className='uact-sm';b.textContent=symbol;b.title=title;
+      b.addEventListener('click',()=>handler(uid,name));chip.appendChild(b);
+    };
+    if(canAct){
+      if(u.muted)addAction('🔊','Səsi aç',unmuteU);else addAction('🔇','Susdur',muteU);
+      addAction('✕','Otaqdan çıxart',kickU);
+      if(me.host){
+        if(u.mod)addAction('⭐','İdarəçi hüququnu al',removeM);
+        else addAction('☆','İdarəçi et',giveM);
+      }
+    }
+    frag.appendChild(chip);
+  });
+  host.replaceChildren(frag);
 }
 function kickU(uid,un){if(!canCtrl())return;DB.ref('rooms/'+room.code+'/users/'+uid).remove();cRef.push({sys:true,text:un+' çıxarıldı',ts:Date.now()});toast('🚫 '+un);}
 function muteU(uid,un){if(!canCtrl())return;DB.ref('rooms/'+room.code+'/users/'+uid+'/muted').set(true);cRef.push({sys:true,text:un+' susturuldu 🔇',ts:Date.now()});}
@@ -846,48 +930,84 @@ function giveM(uid,un){if(!me.host)return;DB.ref('rooms/'+room.code+'/users/'+ui
 function removeM(uid,un){if(!me.host)return;DB.ref('rooms/'+room.code+'/users/'+uid+'/mod').set(false);cRef.push({sys:true,text:un+' idarəçilikdən çıxarıldı',ts:Date.now()});}
 
 // CHAT
-function sendMsg(){
-  if(chatMuted)return;
-  const inp=$('cinp'),txt=inp.value.trim();if(!txt)return;
-  cRef.push({name:me.name,id:me.id,host:me.host,mod:me.mod,text:txt,ts:Date.now()});
-  inp.value='';
+async function sendMsg(){
+  if(chatMuted||sendingMsg||!cRef||!me.id)return;
+  const inp=$('cinp'),btn=$('csend'),txt=inp.value.trim();if(!txt)return;
+  sendingMsg=true;btn.disabled=true;
+  try{
+    await cRef.push({name:me.name,id:me.id,host:me.host,mod:me.mod,text:txt,ts:Date.now()});
+    inp.value='';
+  }catch(e){toast('Mesaj göndərilmədi. İnterneti yoxla.',3500);}
+  finally{sendingMsg=false;btn.disabled=chatMuted;}
 }
-function appendMsg(m){
+function appendMsg(m,notify=false){
+  if(!m)return;
   const box=$('msgs'),d=document.createElement('div');
+  const wasNearBottom=box.scrollHeight-box.scrollTop-box.clientHeight<48;
   const emp=$('chat-empty');if(emp)emp.remove();
-  const time=new Date(m.ts).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
   const isMe=m.id===me.id;
   if(m.sys){
     d.className='msg-row sys';
-    d.innerHTML=`<div class="sys-bubble">— ${esc(m.text)}</div>`;
-  } else {
+    const sys=document.createElement('div');sys.className='sys-bubble';sys.textContent='— '+String(m.text||'');d.appendChild(sys);
+  }else{
     d.className='msg-row '+(isMe?'me':'other');
-    const nc=m.host?'cn-h':m.mod?'cn-m':'cn-u';
-    const badge=m.host?' 👑':m.mod?' 🌟':'';
-    const nameRow=isMe?'':`<div class="bubble-name ${nc}">${esc(m.name)}${badge}</div>`;
-    d.innerHTML=`<div class="bubble">${nameRow}<div>${esc(m.text)}</div><div class="bubble-time">${time}</div></div>`;
-    if(!isMe)chatNotif(m.name+': '+m.text.slice(0,35));
+    const bubble=document.createElement('div');bubble.className='bubble';
+    if(!isMe){
+      const name=document.createElement('div');
+      name.className='bubble-name '+(m.host?'cn-h':m.mod?'cn-m':'cn-u');
+      name.textContent=String(m.name||'İstifadəçi')+(m.host?' 👑':m.mod?' 🌟':'');
+      bubble.appendChild(name);
+    }
+    const body=document.createElement('div');body.textContent=String(m.text||'');bubble.appendChild(body);
+    const stamp=document.createElement('div');stamp.className='bubble-time';
+    const ts=Number(m.ts);stamp.textContent=new Date(Number.isFinite(ts)?ts:Date.now()).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    bubble.appendChild(stamp);d.appendChild(bubble);
+    if(notify&&!isMe)chatNotif(String(m.name||'İstifadəçi')+': '+String(m.text||'').slice(0,35));
   }
-  box.appendChild(d);box.scrollTop=box.scrollHeight;
+  box.appendChild(d);
+  while(box.children.length>MAX_CHAT_MESSAGES)box.removeChild(box.firstElementChild);
+  if(wasNearBottom)box.scrollTop=box.scrollHeight;
 }
 
 // LEAVE
-function leaveRoom(){
-  if(me.host){if(!confirm('Otağı hamı üçün bitirmək istəyirsən?'))return;rRef.remove();}
-  else{if(cRef)cRef.push({sys:true,text:me.name+' otaqdan ayrıldı',ts:Date.now()});if(uRef)uRef.remove();}
-  cleanup();go('scr-home');
+async function leaveRoom(){
+  if(leavingRoom)return;
+  if(me.host&&!confirm('Otağı hamı üçün bitirmək istəyirsən?'))return;
+  leavingRoom=true;$('leave-btn').disabled=true;
+  try{
+    if(me.host){if(rRef)await rRef.remove();}
+    else{
+      if(cRef)cRef.push({sys:true,text:me.name+' otaqdan ayrıldı',ts:Date.now()}).catch(()=>{});
+      if(uRef)await uRef.remove();
+    }
+    cleanup();go('scr-home');
+  }catch(e){
+    leavingRoom=false;$('leave-btn').disabled=false;
+    toast('Otaqdan çıxmaq tamamlana bilmədi. Yenidən yoxla.',4000);
+  }
 }
 function cleanup(){
-  offs.forEach(f=>f());offs=[];
-  vid.src='';vidReady=false;chatMuted=false;lastDBState=null;
-  clearTimeout(bufferingTimer);clearTimeout(bufDebounce);clearTimeout(resumeT);clearTimeout(holdMax);
-  selfPlay=selfPause=holdPause=lastAnyBuf=false;
+  offs.forEach(f=>{try{f();}catch(e){}});offs=[];
+  clearTimeout(bufferingTimer);clearTimeout(bufDebounce);clearTimeout(resumeT);clearTimeout(holdMax);clearTimeout(ctrlT);clearTimeout(tapTm);
+  clearTimeout(toastT);clearTimeout(cnotifT);
+  try{vid.pause();vid.removeAttribute('src');vid.load();}catch(e){}
+  vidReady=false;chatMuted=false;lastDBState=null;lastPushedTime=null;lastPushedAt=null;
+  selfPlay=selfPause=holdPause=lastAnyBuf=false;isDrag=false;sendingMsg=false;leavingRoom=false;kickNoticePending=false;
   rRef=uRef=cRef=vRef=null;
   me={name:'',id:'',host:false,mod:false};room={code:'',url:''};
-  $('msgs').innerHTML='<div class="chat-empty" id="chat-empty">Hələ mesaj yoxdur. İlk yazan sən ol.</div>';$('uchips').innerHTML='';
-  $('room').classList.remove('on');vw.classList.remove('cs');
-  if(isFakeFS)exitFS();
-  $('leave-btn').textContent='Otaqdan çıx';hideBufInfo();
+  $('msgs').replaceChildren();
+  const empty=document.createElement('div');empty.className='chat-empty';empty.id='chat-empty';empty.textContent='Hələ mesaj yoxdur. İlk yazan sən ol.';$('msgs').appendChild(empty);
+  $('uchips').replaceChildren();
+  $('mnote').style.display='none';$('cinp').value='';$('cinp').disabled=false;$('csend').disabled=false;
+  $('pfill').style.width='0%';$('pbuf').style.width='0%';$('vt').textContent='0:00 / 0:00';
+  $('bspin').classList.remove('show');vid.muted=false;vid.volume=lastVolume||1;vid.playbackRate=curSpd;$('vsl').value=vid.volume;updateVI();
+  $('smenu').classList.remove('open');$('leave-btn').textContent='Otaqdan çıx';$('leave-btn').disabled=false;
+  $('cnotif').classList.remove('show');$('toast').classList.remove('show');hideBufInfo();
+  const tap=$('tap-ov');if(tap)tap.remove();
+  pw.classList.remove('drag');vw.classList.remove('cs');
+  if(isFakeFS||fsElement())exitFS();
+  if(fsMode==='css'){$('room').classList.remove('fake-fs');vw.style.width='';vw.style.height='';}
+  $('room').classList.remove('on');
 }
 
 // URL join
@@ -895,12 +1015,16 @@ const urlParams=new URLSearchParams(window.location.search);
 const joinCode=urlParams.get('join');
 if(joinCode&&joinCode.length>=5){$('j-code').value=joinCode.slice(0,5).toUpperCase();go('scr-join');}
 
-// Kick detection
-setInterval(()=>{
-  if(!room.code||!me.id||me.host)return;
-  DB.ref('rooms/'+room.code+'/users/'+me.id).get().then(s=>{
-    if(room.code&&!s.exists()){toast('🚫 Siz otaqdan çıxarıldınız',4000);setTimeout(()=>{cleanup();go('scr-home');},1500);}
-  });
+// Kick detection — old requests must never eject a user from a newly joined room.
+kickCheckTimer=setInterval(()=>{
+  const checkedCode=room.code,checkedUser=me.id;
+  if(!checkedCode||!checkedUser||me.host||kickNoticePending)return;
+  DB.ref('rooms/'+checkedCode+'/users/'+checkedUser).get().then(s=>{
+    if(room.code===checkedCode&&me.id===checkedUser&&!s.exists()){
+      kickNoticePending=true;toast('🚫 Siz otaqdan çıxarıldınız',4000);
+      setTimeout(()=>{if(room.code===checkedCode&&me.id===checkedUser){cleanup();go('scr-home');}},1500);
+    }
+  }).catch(()=>{});
 },3000);
 </script>
 </body>
